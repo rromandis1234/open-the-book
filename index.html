@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Open the Book · A Beginner's Bible Game</title>
+  <meta name="description" content="A bright, friendly game for people new to the Bible. No experience needed. Meet John the lamb.">
+  <meta name="theme-color" content="#7fcfff">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --sky: #7fcfff;
+      --sky-deep: #3aa8ff;
+      --cream: #fff8e7;
+      --sun: #ffc83d;
+      --sun-deep: #e9a51a;
+      --coral: #ff6f61;
+      --mint: #35c28a;
+      --grape: #7b5cd6;
+      --ink: #1b2a4a;
+      --ink-soft: #3c4d70;
+      --white: #ffffff;
+      --radius: 26px;
+      --chunk: 0 6px 0 var(--ink);
+      --display: 'Fredoka', 'Trebuchet MS', system-ui, sans-serif;
+      --body: 'Nunito', 'Segoe UI', system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; font-family: var(--body); color: var(--ink); }
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 12% 8%, rgba(255,255,255,0.55) 0 90px, transparent 91px),
+        radial-gradient(circle at 88% 14%, rgba(255,255,255,0.45) 0 120px, transparent 121px),
+        linear-gradient(180deg, var(--sky) 0%, #c9ecff 58%, var(--cream) 100%);
+      background-attachment: fixed;
+      overflow-x: hidden;
+    }
+    h1, h2, h3 { font-family: var(--display); font-weight: 700; line-height: 1.1; margin: 0 0 0.45em; }
+    p { margin: 0 0 1em; }
+    :focus-visible { outline: 4px solid var(--grape); outline-offset: 4px; border-radius: 12px; }
+
+    /* Decorative light rays from the top, a quiet nod to stained glass */
+    .rays { position: fixed; inset: 0 0 auto 0; height: 60vh; pointer-events: none; z-index: 0;
+      background: repeating-conic-gradient(from 200deg at 50% -10%, rgba(255,255,255,0.22) 0 4deg, transparent 4deg 14deg);
+      mask-image: linear-gradient(180deg, #000 0%, transparent 100%); }
+    .cloud { position: fixed; pointer-events: none; z-index: 0; opacity: .9; }
+    .cloud svg { display: block; width: 100%; height: auto; }
+    .cloud--a { top: 9%; left: -40px; width: 220px; animation: drift 38s linear infinite; }
+    .cloud--b { top: 22%; right: -60px; width: 300px; animation: drift 52s linear infinite reverse; }
+    .cloud--c { bottom: 8%; left: 6%; width: 180px; animation: drift 44s linear infinite; }
+    @keyframes drift { from { transform: translateX(0); } to { transform: translateX(60px); } }
+
+    .site { position: relative; z-index: 1; }
+    header.top { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 18px 28px; }
+    .logo { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; color: var(--ink); font-family: var(--display); font-size: 1.5rem; font-weight: 700; }
+    .logo-badge { width: 52px; height: 52px; border-radius: 16px; background: var(--sun); border: 3px solid var(--ink); box-shadow: var(--chunk); display: grid; place-items: center; }
+    .meet-pill { background: var(--white); border: 3px solid var(--ink); border-radius: 999px; padding: 8px 16px; font-weight: 800; font-size: 0.95rem; box-shadow: 0 4px 0 var(--ink); }
+
+    main.wrap { position: relative; z-index: 1; max-width: 980px; margin: 0 auto; padding: 8px 20px 60px; }
+
+    .panel { background: var(--white); border: 4px solid var(--ink); border-radius: var(--radius); box-shadow: 0 10px 0 var(--ink); padding: 32px; position: relative; }
+    .panel + .panel { margin-top: 24px; }
+
+    .btn { appearance: none; border: 3px solid var(--ink); border-radius: 999px; background: var(--sun); color: var(--ink);
+      font-family: var(--display); font-size: 1.25rem; font-weight: 700; padding: 14px 30px; min-height: 56px; cursor: pointer;
+      box-shadow: 0 6px 0 var(--ink); transform: translateY(0); transition: transform .12s ease, box-shadow .12s ease, background-color .2s; }
+    .btn:hover { background: #ffd65e; }
+    .btn:active { transform: translateY(5px); box-shadow: 0 1px 0 var(--ink); }
+    .btn:disabled { opacity: .45; cursor: default; transform: none; box-shadow: 0 6px 0 var(--ink); }
+    .btn--sky { background: var(--sky-deep); color: var(--white); }
+    .btn--sky:hover { background: #2b97f0; }
+    .btn--light { background: var(--white); }
+    .btn--light:hover { background: #eef8ff; }
+    .row { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+    .hidden { display: none !important; }
+
+    /* John the lamb */
+    .john { width: 150px; flex: none; }
+    .john svg { width: 100%; height: auto; overflow: visible; }
+    .john.bob svg { animation: bob 2.6s ease-in-out infinite; transform-origin: 50% 100%; }
+    .john.jump svg { animation: jump .7s cubic-bezier(.3,1.6,.5,1); }
+    .john.wobble svg { animation: wobble .6s ease; }
+    @keyframes bob { 0%,100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-6px) rotate(-1.5deg); } }
+    @keyframes jump { 0% { transform: translateY(0) scale(1,1); } 35% { transform: translateY(-22px) scale(.97,1.03); } 70% { transform: translateY(0) scale(1.05,.95); } 100% { transform: translateY(0) scale(1,1); } }
+    @keyframes wobble { 0%,100% { transform: rotate(0); } 25% { transform: rotate(-6deg); } 75% { transform: rotate(6deg); } }
+
+    .bubble { position: relative; background: var(--white); border: 3px solid var(--ink); border-radius: 22px; padding: 16px 20px; box-shadow: 0 5px 0 var(--ink); font-weight: 800; font-size: 1.1rem; flex: 1; min-width: 0; }
+    .bubble::before { content: ""; position: absolute; left: -16px; top: 26px; width: 22px; height: 22px; background: var(--white); border-left: 3px solid var(--ink); border-bottom: 3px solid var(--ink); transform: rotate(45deg); }
+    .talk { display: flex; align-items: center; gap: 22px; margin-bottom: 26px; }
+
+    /* Start screen */
+    .hero-title { font-size: clamp(2.8rem, 6.5vw, 4.6rem); color: var(--ink); text-shadow: 0 4px 0 var(--sun); margin: 6px 0 12px; }
+    .eyebrow { display: inline-block; background: var(--mint); color: var(--white); border: 3px solid var(--ink); border-radius: 999px; padding: 6px 16px; font-weight: 800; box-shadow: 0 4px 0 var(--ink); margin-bottom: 14px; font-size: .95rem; }
+    .lead { font-size: 1.2rem; color: var(--ink-soft); font-weight: 700; max-width: 56ch; margin-bottom: 24px; }
+    .steps { display: grid; gap: 14px; grid-template-columns: 1fr; margin: 0 0 26px; padding: 0; list-style: none; }
+    @media (min-width: 720px) { .steps { grid-template-columns: 1fr 1fr; } }
+    .steps li { display: flex; gap: 14px; align-items: center; background: #f2faff; border: 3px solid var(--ink); border-radius: 18px; padding: 14px 16px; font-weight: 700; }
+    .step-n { flex: none; width: 44px; height: 44px; border-radius: 50%; border: 3px solid var(--ink); display: grid; place-items: center; font-family: var(--display); font-weight: 700; font-size: 1.2rem; color: var(--ink); }
+    .s1 .step-n { background: #ffd65e; } .s2 .step-n { background: #9be3c2; } .s3 .step-n { background: #b8e4ff; } .s4 .step-n { background: #ffb8ad; }
+
+    /* Game */
+    .game-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+    .round-pill { display: inline-flex; align-items: center; gap: 10px; border: 3px solid var(--ink); border-radius: 999px; padding: 6px 16px 6px 8px; font-weight: 800; background: var(--white); box-shadow: 0 4px 0 var(--ink); }
+    .round-num { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; border: 3px solid var(--ink); font-family: var(--display); font-weight: 700; }
+    .count-pill { font-weight: 800; background: var(--ink); color: var(--white); border-radius: 999px; padding: 8px 16px; }
+    .progress { height: 18px; border: 3px solid var(--ink); border-radius: 999px; background: var(--white); overflow: hidden; margin-bottom: 26px; }
+    .progress > span { display: block; height: 100%; width: 0; background: repeating-linear-gradient(-45deg, var(--sun) 0 14px, #ffd96b 14px 28px); border-right: 3px solid var(--ink); transition: width .45s cubic-bezier(.3,1.3,.5,1); }
+
+    .question { font-size: clamp(2rem, 4.6vw, 2.9rem); color: var(--ink); margin: 0 0 6px; text-align: left; }
+    .hint { font-weight: 700; color: var(--ink-soft); font-size: 1.1rem; margin-bottom: 18px; }
+    .choices { display: grid; gap: 14px; margin: 8px 0 20px; }
+    @media (min-width: 720px) { .choices.two { grid-template-columns: 1fr 1fr; } .choices.three { grid-template-columns: 1fr 1fr 1fr; } }
+    .choice { appearance: none; text-align: center; font-family: var(--display); font-size: 1.35rem; font-weight: 600; color: var(--ink); background: var(--white); border: 3px solid var(--ink); border-radius: 20px; padding: 18px 20px; min-height: 66px; cursor: pointer; box-shadow: 0 6px 0 var(--ink); transform: translateY(0); transition: transform .12s ease, background-color .2s, box-shadow .12s; }
+    .choice:hover:not(:disabled) { background: #f0f9ff; transform: translateY(-2px); }
+    .choice:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 2px 0 var(--ink); }
+    .choice[aria-pressed="true"] { background: #e7f5ff; }
+    .choice.correct { background: #b9f5d9; }
+    .choice.wrong { background: #ffd0ca; }
+    .choice:disabled { cursor: default; }
+
+    .feedback { min-height: 3.4em; padding: 16px 20px; border: 3px solid var(--ink); border-radius: 20px; background: #f2faff; font-weight: 700; font-size: 1.08rem; }
+    .feedback.good { background: #b9f5d9; }
+    .feedback.bad { background: #ffd0ca; }
+    .feedback strong { font-family: var(--display); font-size: 1.2rem; display: block; margin-bottom: 4px; }
+    .nav-row { display: flex; justify-content: flex-end; margin-top: 22px; }
+
+    /* Finish */
+    .final { text-align: center; }
+    .trophy { width: 180px; margin: 0 auto 6px; }
+    .big-score { font-family: var(--display); font-weight: 700; font-size: clamp(3.4rem, 9vw, 5.4rem); color: var(--ink); margin: 6px 0 4px; text-shadow: 0 5px 0 var(--sun); }
+    .big-score small { font-size: .45em; color: var(--ink-soft); text-shadow: none; }
+    .final h2 { font-size: 2.4rem; }
+    .lessons { text-align: left; max-width: 620px; margin: 26px auto; background: #f2faff; border: 3px solid var(--ink); border-radius: 22px; padding: 18px 26px; }
+    .lessons li { margin: 8px 0; font-weight: 700; }
+    .lessons ol, .lessons ul { padding-left: 22px; margin: 0; }
+    .review-item { text-align: left; border: 3px solid var(--ink); border-radius: 18px; padding: 14px 18px; margin: 10px 0; font-weight: 700; }
+    .review-item strong { font-family: var(--display); font-size: 1.15rem; display: block; }
+    .review-item.good { background: #b9f5d9; }
+    .review-item.bad { background: #ffd0ca; }
+
+    .confetti { position: fixed; top: -20px; width: 12px; height: 16px; border: 2px solid var(--ink); z-index: 5; pointer-events: none; animation: fall linear forwards; }
+    @keyframes fall { to { transform: translateY(110vh) rotate(720deg); opacity: 0.8; } }
+
+    footer.foot { position: relative; z-index: 1; text-align: center; padding: 22px; font-weight: 800; color: var(--ink); }
+    footer.foot span { background: var(--white); border: 3px solid var(--ink); border-radius: 999px; padding: 8px 18px; box-shadow: 0 4px 0 var(--ink); display: inline-block; }
+
+
+    /* Phone layout (under 600px). Desktop is unchanged. */
+    @media (max-width: 599px) {
+      header.top { padding: 12px 14px; gap: 8px; }
+      .logo { font-size: 1.2rem; gap: 8px; white-space: nowrap; }
+      header.top .meet-pill { display: none; }
+      .logo-badge { width: 42px; height: 42px; border-radius: 13px; }
+      .logo-badge svg { width: 24px; height: 24px; }
+      .meet-pill { font-size: 0.78rem; padding: 6px 10px; box-shadow: 0 3px 0 var(--ink); white-space: nowrap; }
+      main.wrap { padding: 4px 12px 40px; }
+      .panel { padding: 20px 16px; border-radius: 22px; box-shadow: 0 7px 0 var(--ink); border-width: 3px; }
+      .panel + .panel { margin-top: 16px; }
+      .talk { flex-direction: row; align-items: center; gap: 12px; margin-bottom: 18px; }
+      .john { width: 92px; }
+      .bubble { font-size: 1rem; padding: 12px 14px; border-radius: 18px; }
+      .bubble::before { left: -11px; top: 18px; width: 16px; height: 16px; }
+      .eyebrow { font-size: 0.8rem; padding: 5px 12px; margin-bottom: 10px; }
+      .hero-title { font-size: 2.5rem; margin: 2px 0 8px; text-shadow: 0 3px 0 var(--sun); }
+      .lead { font-size: 1.02rem; margin-bottom: 18px; }
+      .steps { grid-template-columns: 1fr; gap: 10px; margin-bottom: 20px; }
+      .steps li { padding: 10px 12px; gap: 12px; font-size: 0.98rem; border-radius: 16px; }
+      .step-n { width: 36px; height: 36px; font-size: 1.05rem; }
+      .row { flex-direction: column; align-items: stretch; gap: 12px; }
+      .row .btn { width: 100%; }
+      .row .meet-pill { text-align: center; }
+      .btn { font-size: 1.15rem; min-height: 54px; padding: 12px 22px; }
+      .game-head { gap: 8px; margin-bottom: 12px; }
+      .round-pill { font-size: 0.85rem; padding: 4px 12px 4px 5px; gap: 8px; }
+      .round-num { width: 28px; height: 28px; font-size: 0.95rem; }
+      .count-pill { font-size: 0.85rem; padding: 6px 12px; }
+      .progress { height: 14px; margin-bottom: 18px; }
+      .question { font-size: 1.65rem; }
+      .hint { font-size: 1rem; margin-bottom: 12px; }
+      .choices { gap: 10px; margin: 6px 0 14px; }
+      .choice { font-size: 1.15rem; min-height: 58px; padding: 14px 14px; border-radius: 18px; }
+      .feedback { font-size: 1rem; padding: 12px 14px; min-height: 0; border-radius: 16px; }
+      .feedback strong { font-size: 1.05rem; }
+      .nav-row { margin-top: 16px; }
+      .nav-row .btn { width: 100%; }
+      .trophy { width: 120px; }
+      .big-score { font-size: 3.4rem; }
+      .final h2 { font-size: 1.9rem; }
+      .lessons { padding: 14px 16px; margin: 18px 0; border-radius: 18px; }
+      .lessons li { font-size: 0.95rem; margin: 6px 0; }
+      .review-item { font-size: 0.95rem; padding: 10px 12px; border-radius: 14px; }
+      .review-item strong { font-size: 1.02rem; }
+      footer.foot { padding: 16px 12px; font-size: 0.85rem; }
+      footer.foot span { display: block; border-radius: 18px; padding: 8px 12px; line-height: 1.35; }
+    }
+
+
+    /* Puffy, cute finish. Soft highlights make the chunky shapes feel inflated. */
+    .panel { background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%); }
+    .panel::before { content: ''; position: absolute; top: 10px; left: 18px; right: 18px; height: 22%; border-radius: 22px 22px 60% 60%; background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0)); pointer-events: none; }
+    .btn, .choice, .steps li, .bubble, .eyebrow, .meet-pill, .round-pill, .count-pill, .feedback { box-shadow: inset 0 -5px 0 rgba(27,42,74,0.12), 0 6px 0 var(--ink); }
+    .btn:active, .choice:active:not(:disabled) { box-shadow: inset 0 -2px 0 rgba(27,42,74,0.12), 0 1px 0 var(--ink); }
+    .hero-title { letter-spacing: 0.5px; }
+    .steps li { transition: transform .2s ease; }
+    .steps li:hover { transform: translateY(-3px) rotate(-0.6deg); }
+    .btn:hover { animation: wiggle .5s ease; }
+    .logo-badge { animation: float 3.6s ease-in-out infinite; }
+    .progress > span { transition: width .6s cubic-bezier(.3,1.3,.5,1); }
+
+    /* Entrances: panels puff in, list items pop one after another. */
+    .panel:not(.hidden) { animation: puff .55s cubic-bezier(.3,1.4,.5,1) both; }
+    .steps li { animation: pop .5s cubic-bezier(.3,1.4,.5,1) both; }
+    .steps li:nth-child(2) { animation-delay: .08s; } .steps li:nth-child(3) { animation-delay: .16s; } .steps li:nth-child(4) { animation-delay: .24s; }
+    .choices .choice { animation: pop .4s cubic-bezier(.3,1.4,.5,1) both; }
+    .choices .choice:nth-child(2) { animation-delay: .07s; } .choices .choice:nth-child(3) { animation-delay: .14s; }
+    .feedback:not(:empty) { animation: pop .35s cubic-bezier(.3,1.4,.5,1) both; }
+    .review-item { animation: pop .35s ease both; }
+
+    /* Cute little idle motion on the lamb's speech bubble and clouds */
+    .bubble { animation: wobbleSoft 4s ease-in-out infinite; }
+    .cloud--a, .cloud--c { animation-duration: 40s; }
+
+    @keyframes puff { from { opacity: 0; transform: translateY(18px) scale(.96); } to { opacity: 1; transform: none; } }
+    @keyframes pop { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: scale(1); } }
+    @keyframes wiggle { 0%,100% { transform: rotate(0); } 25% { transform: rotate(-2deg); } 75% { transform: rotate(2deg); } }
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+    @keyframes wobbleSoft { 0%,100% { transform: rotate(-0.4deg); } 50% { transform: rotate(0.4deg); } }
+
+    /* Phone: cuter, puffier text */
+    @media (max-width: 599px) {
+      .hero-title { font-size: 2.75rem; line-height: 1.02; }
+      .question { font-size: 1.8rem; }
+      .choice { font-size: 1.22rem; border-width: 3px; }
+      .lead, .hint { font-size: 1.08rem; }
+      .eyebrow { font-size: 0.9rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .panel:not(.hidden), .steps li, .choices .choice, .feedback, .review-item, .bubble, .logo-badge, .btn:hover { animation: none !important; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+      .cloud, .confetti { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <noscript><div style="max-width:560px;margin:40px auto;padding:20px;background:#fff;border:3px solid #1b2a4a;border-radius:18px;font-family:system-ui,sans-serif;font-weight:700;color:#1b2a4a;text-align:center">This game needs a web browser to run. On an iPhone, tap Share, then Open in Safari. On a computer, double-click the file.</div></noscript>
+  <div class="rays" aria-hidden="true"></div>
+  <div class="cloud cloud--a" aria-hidden="true"><svg viewBox="0 0 300 120"><path fill="#fff" d="M40 110c-22 0-34-16-30-32 3-14 18-22 30-18 4-22 24-38 48-34 10-16 30-22 48-14 14-10 36-6 46 10 24-6 46 6 50 28 22 0 34 16 28 34-4 12-16 16-26 16z"/></svg></div>
+  <div class="cloud cloud--b" aria-hidden="true"><svg viewBox="0 0 300 120"><path fill="#fff" d="M40 110c-22 0-34-16-30-32 3-14 18-22 30-18 4-22 24-38 48-34 10-16 30-22 48-14 14-10 36-6 46 10 24-6 46 6 50 28 22 0 34 16 28 34-4 12-16 16-26 16z"/></svg></div>
+  <div class="cloud cloud--c" aria-hidden="true"><svg viewBox="0 0 300 120"><path fill="#fff" d="M40 110c-22 0-34-16-30-32 3-14 18-22 30-18 4-22 24-38 48-34 10-16 30-22 48-14 14-10 36-6 46 10 24-6 46 6 50 28 22 0 34 16 28 34-4 12-16 16-26 16z"/></svg></div>
+
+  <div class="site">
+    <header class="top">
+      <a class="logo" href="#start">
+        <span class="logo-badge" aria-hidden="true">
+          <svg width="30" height="30" viewBox="0 0 64 64"><path fill="#1b2a4a" d="M29 6h6v52h-6zM8 22h48v6H8zM4 14h6v22H4zM54 14h6v22h-6z"/></svg>
+        </span>
+        Open the Book
+      </a>
+      <span class="meet-pill">Bible study · Mondays 7 p.m.</span>
+    </header>
+
+    <main class="wrap">
+      <!-- START -->
+      <section id="start" class="panel" aria-labelledby="start-title">
+        <div class="talk">
+          <div class="john bob" data-john>
+            <!-- John: a cartoon lamb -->
+            <svg viewBox="0 0 200 200" role="img" aria-label="John the lamb">
+              <ellipse cx="100" cy="190" rx="62" ry="8" fill="#1b2a4a" opacity=".15"/>
+              <g stroke="#1b2a4a" stroke-width="5" stroke-linejoin="round">
+                <circle cx="62" cy="108" r="30" fill="#fff"/>
+                <circle cx="100" cy="92" r="36" fill="#fff"/>
+                <circle cx="138" cy="108" r="30" fill="#fff"/>
+                <circle cx="78" cy="132" r="28" fill="#fff"/>
+                <circle cx="122" cy="132" r="28" fill="#fff"/>
+                <ellipse cx="100" cy="120" rx="46" ry="34" fill="#fff"/>
+              </g>
+              <g stroke="#1b2a4a" stroke-width="5" stroke-linejoin="round">
+                <ellipse cx="100" cy="66" rx="34" ry="28" fill="#ffe2c2"/>
+                <ellipse cx="72" cy="58" rx="12" ry="8" fill="#ffe2c2" transform="rotate(-25 72 58)"/>
+                <ellipse cx="128" cy="58" rx="12" ry="8" fill="#ffe2c2" transform="rotate(25 128 58)"/>
+              </g>
+              <ellipse cx="100" cy="36" rx="22" ry="5" fill="none" stroke="#ffc83d" stroke-width="5"/>
+              <circle cx="88" cy="66" r="5" fill="#1b2a4a"/>
+              <circle cx="112" cy="66" r="5" fill="#1b2a4a"/>
+              <circle cx="90" cy="64" r="1.6" fill="#fff"/>
+              <circle cx="114" cy="64" r="1.6" fill="#fff"/>
+              <circle cx="80" cy="76" r="5" fill="#ff8fa3" opacity=".8"/>
+              <circle cx="120" cy="76" r="5" fill="#ff8fa3" opacity=".8"/>
+              <path d="M94 78 q6 6 12 0" fill="none" stroke="#1b2a4a" stroke-width="3.5" stroke-linecap="round"/>
+              <g stroke="#1b2a4a" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+                <rect x="58" y="152" width="62" height="40" rx="8" fill="#ff6f61"/>
+                <path d="M89 152v40" stroke="#1b2a4a" stroke-width="4"/>
+                <path d="M62 152 L89 168 L116 152" fill="#fff" stroke="#1b2a4a"/>
+              </g>
+              <g stroke="#1b2a4a" stroke-width="5" stroke-linejoin="round">
+                <rect x="66" y="176" width="16" height="14" rx="6" fill="#ffe2c2"/>
+                <rect x="118" y="176" width="16" height="14" rx="6" fill="#ffe2c2"/>
+              </g>
+            </svg>
+          </div>
+          <div class="bubble" id="john-bubble" aria-live="polite">Hi! I'm John. Let's open the book together!</div>
+        </div>
+
+        <span class="eyebrow">A game for beginners</span>
+        <h1 id="start-title" class="hero-title">Open the Book</h1>
+        <p class="lead">Four bouncy little rounds about how the Bible is put together. No experience needed, and every answer comes with a friendly explanation from John.</p>
+
+        <ol class="steps">
+          <li class="s1"><span class="step-n">1</span><span><strong>Two parts</strong><br>Sort books into the first and second parts.</span></li>
+          <li class="s2"><span class="step-n">2</span><span><strong>Find the address</strong><br>How "John 3:16" works.</span></li>
+          <li class="s3"><span class="step-n">3</span><span><strong>Words you will hear</strong><br>Match church words to plain meanings.</span></li>
+          <li class="s4"><span class="step-n">4</span><span><strong>The four Gospels</strong><br>Meet the first four books of the New Testament.</span></li>
+        </ol>
+
+        <div class="row">
+          <button class="btn" id="btn-begin" type="button">Let's play!</button>
+          <span class="meet-pill">About 5 minutes</span>
+        </div>
+      </section>
+
+      <!-- GAME -->
+      <section id="game" class="panel hidden" aria-live="off">
+        <div class="talk">
+          <div class="john bob" id="john-game" data-john>
+            <svg viewBox="0 0 200 200" role="img" aria-label="John the lamb"><use href="#john-art"/></svg>
+          </div>
+          <div class="bubble" id="john-game-bubble" aria-live="polite"></div>
+        </div>
+
+        <div class="game-head">
+          <span class="round-pill"><span class="round-num" id="round-num">1</span><span id="round-label">Round 1 of 4</span></span>
+          <span class="count-pill" id="count-label">Question 1 of 21</span>
+        </div>
+        <div class="progress" aria-hidden="true"><span id="bar"></span></div>
+
+        <h2 class="question" id="question"></h2>
+        <p class="hint" id="hint"></p>
+        <div class="choices" id="choices" role="group" aria-labelledby="question"></div>
+        <div class="feedback" id="feedback" role="status" aria-live="polite">Pick an answer to see the explanation.</div>
+        <div class="nav-row">
+          <button class="btn btn--sky" id="btn-next" type="button" disabled>Next</button>
+        </div>
+      </section>
+
+      <!-- END -->
+      <section id="end" class="panel final hidden" aria-labelledby="end-title">
+        <div class="trophy john jump" id="john-end">
+          <svg viewBox="0 0 200 200" role="img" aria-label="John the lamb celebrating"><use href="#john-art"/></svg>
+        </div>
+        <span class="eyebrow">Finished!</span>
+        <h2 id="end-title">Great job!</h2>
+        <div class="big-score"><span id="final-score">0</span><small> / <span id="final-total">21</span></small></div>
+        <p id="end-message" class="lead" style="margin:0 auto 6px"></p>
+
+        <div class="lessons">
+          <h3 style="font-size:1.4rem">What you learned</h3>
+          <ul>
+            <li>The Bible has two main parts: the Old Testament and the New Testament.</li>
+            <li>A reference like <em>Psalm 23:1</em> names a book, a chapter and a verse.</li>
+            <li>Words like <em>gospel</em>, <em>epistle</em> and <em>psalm</em> describe kinds of writing.</li>
+            <li>The four Gospels are Matthew, Mark, Luke and John.</li>
+          </ul>
+        </div>
+
+        <div class="row" style="justify-content:center">
+          <button class="btn" id="btn-again" type="button">Play again</button>
+          <button class="btn btn--light" id="btn-review" type="button">See my answers</button>
+        </div>
+        <div id="review" class="hidden" style="text-align:left;margin-top:24px"></div>
+      </section>
+    </main>
+
+    <footer class="foot"><span>Bible study group · every Monday at 7 p.m. · Questions for beginners, from beginners</span></footer>
+  </div>
+
+  <!-- Shared John artwork, reused by the game and finish screens -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="john-art" viewBox="0 0 200 200">
+      <ellipse cx="100" cy="190" rx="62" ry="8" fill="#1b2a4a" opacity=".15"/>
+      <g stroke="#1b2a4a" stroke-width="5" stroke-linejoin="round">
+        <circle cx="62" cy="108" r="30" fill="#fff"/>
+        <circle cx="100" cy="92" r="36" fill="#fff"/>
+        <circle cx="138" cy="108" r="30" fill="#fff"/>
+        <circle cx="78" cy="132" r="28" fill="#fff"/>
+        <circle cx="122" cy="132" r="28" fill="#fff"/>
+        <ellipse cx="100" cy="120" rx="46" ry="34" fill="#fff"/>
+        <ellipse cx="100" cy="66" rx="34" ry="28" fill="#ffe2c2"/>
+        <ellipse cx="72" cy="58" rx="12" ry="8" fill="#ffe2c2" transform="rotate(-25 72 58)"/>
+        <ellipse cx="128" cy="58" rx="12" ry="8" fill="#ffe2c2" transform="rotate(25 128 58)"/>
+        <rect x="58" y="152" width="62" height="40" rx="8" fill="#ff6f61"/>
+        <rect x="66" y="176" width="16" height="14" rx="6" fill="#ffe2c2"/>
+        <rect x="118" y="176" width="16" height="14" rx="6" fill="#ffe2c2"/>
+      </g>
+      <ellipse cx="100" cy="36" rx="22" ry="5" fill="none" stroke="#ffc83d" stroke-width="5"/>
+      <circle cx="88" cy="66" r="5" fill="#1b2a4a"/>
+      <circle cx="112" cy="66" r="5" fill="#1b2a4a"/>
+      <circle cx="90" cy="64" r="1.6" fill="#fff"/>
+      <circle cx="114" cy="64" r="1.6" fill="#fff"/>
+      <circle cx="80" cy="76" r="5" fill="#ff8fa3" opacity=".8"/>
+      <circle cx="120" cy="76" r="5" fill="#ff8fa3" opacity=".8"/>
+      <path d="M94 78 q6 6 12 0" fill="none" stroke="#1b2a4a" stroke-width="3.5" stroke-linecap="round"/>
+      <path d="M62 152 L89 168 L116 152" fill="#fff" stroke="#1b2a4a" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M89 152v40" stroke="#1b2a4a" stroke-width="4"/>
+    </symbol>
+  </svg>
+
+  <script>
+    (function () {
+      // Content is unchanged from the first version. Only presentation has changed.
+      var ROUNDS = [
+        {
+          name: 'Two parts', color: '#ffd65e',
+          intro: 'Choose which part of the Bible each book belongs to.',
+          questions: [
+            { prompt: 'Genesis', hint: 'Often the first book in the Bible.', options: ['Old Testament', 'New Testament'], answer: 0,
+              why: 'Genesis is the first book, so it belongs to the Old Testament, the first part of the Bible.' },
+            { prompt: 'Matthew', hint: 'It tells the story of Jesus.', options: ['Old Testament', 'New Testament'], answer: 1,
+              why: 'Matthew is in the New Testament, the second part. It tells the story of Jesus.' },
+            { prompt: 'Psalms', hint: 'A collection of songs and prayers.', options: ['Old Testament', 'New Testament'], answer: 0,
+              why: 'Psalms is in the Old Testament. Its 150 songs and prayers are among the best known parts of the Bible.' },
+            { prompt: 'Acts', hint: 'It describes what happened after Jesus returned to heaven.', options: ['Old Testament', 'New Testament'], answer: 1,
+              why: 'Acts is in the New Testament. It continues the story from the Gospels.' },
+            { prompt: 'Proverbs', hint: 'Short sayings about everyday wisdom.', options: ['Old Testament', 'New Testament'], answer: 0,
+              why: 'Proverbs is in the Old Testament, a book of short, practical sayings.' },
+            { prompt: 'Romans', hint: 'A long letter written to a group of believers.', options: ['Old Testament', 'New Testament'], answer: 1,
+              why: 'Romans is a letter in the New Testament. Many New Testament books are letters.' }
+          ]
+        },
+        {
+          name: 'Find the address', color: '#9be3c2',
+          intro: 'A Bible reference works like an address: book, then chapter, then verse.',
+          questions: [
+            { prompt: 'In John 3:16, which number is the chapter?', hint: 'Read the reference from left to right.', options: ['John', '3', '16'], answer: 1,
+              why: 'In John 3:16, "John" is the book, "3" is the chapter, and "16" is the verse.' },
+            { prompt: 'In Psalm 23:1, which number is the verse?', hint: 'The verse number comes after the colon.', options: ['23', '1', 'Psalm'], answer: 1,
+              why: 'The number after the colon is the verse. In Psalm 23:1, the chapter is 23 and the verse is 1.' },
+            { prompt: 'In Genesis 1:1, what is the book?', hint: 'The book name comes first.', options: ['1:1', 'Genesis', 'Chapter'], answer: 1,
+              why: 'The first word is the book name. Here the book is Genesis.' },
+            { prompt: 'Which reference means chapter 2, verse 5 of the book of Mark?', hint: 'Book, then chapter, then verse.', options: ['Mark 2:5', '2 Mark:5', 'Mark 5:2'], answer: 0,
+              why: 'Mark 2:5 means book Mark, chapter 2, verse 5. The book name always comes first.' },
+            { prompt: 'Which tells you the verse?', hint: 'Look for the number after the colon.', options: ['The number before the colon', 'The number after the colon', 'The book name'], answer: 1,
+              why: 'Chapter is the number before the colon. Verse is the number after it.' },
+            { prompt: 'John 1:1 is a reference to which book?', hint: 'The book name is the first word.', options: ['1 John', 'John', 'Chapter 1'], answer: 1,
+              why: 'The book is John, chapter 1, verse 1. Books with a number before the name, like 1 John, are separate books.' }
+          ]
+        },
+        {
+          name: 'Words you will hear', color: '#b8e4ff',
+          intro: 'Match each word to its plain meaning. These words appear often in Bible study.',
+          questions: [
+            { prompt: 'Gospel', hint: 'Used for the first four books of the New Testament.', options: ['Good news', 'A long journey', 'A house of prayer'], answer: 0,
+              why: 'Gospel means "good news". The first four New Testament books are called the Gospels.' },
+            { prompt: 'Epistle', hint: 'Many New Testament books use this kind of writing.', options: ['A song', 'A letter', 'A law'], answer: 1,
+              why: 'An epistle is a letter. Romans and Galatians are examples.' },
+            { prompt: 'Psalm', hint: 'Many are sung or prayed.', options: ['A song or poem', 'A meal', 'A king'], answer: 0,
+              why: 'A psalm is a song or poem, and the book of Psalms is a collection of them.' },
+            { prompt: 'Prophet', hint: 'Someone who passed on messages.', options: ['A builder', 'Someone who spoke a message for others', 'A teacher of numbers'], answer: 1,
+              why: 'A prophet was someone who spoke messages for others. Many Old Testament books are named after prophets.' },
+            { prompt: 'Covenant', hint: 'A kind of promise or agreement.', options: ['A promise or agreement', 'A kind of fabric', 'A type of tree'], answer: 0,
+              why: 'A covenant is a promise or agreement between people, or between God and people.' }
+          ]
+        },
+        {
+          name: 'The four Gospels', color: '#ffb8ad',
+          intro: 'The first four books of the New Testament are called the Gospels.',
+          questions: [
+            { prompt: 'Which book comes first in the New Testament?', hint: 'It is the first book after the Old Testament.', options: ['Matthew', 'Mark', 'John'], answer: 0,
+              why: 'Matthew is the first book of the New Testament.' },
+            { prompt: 'How many Gospels are there?', hint: 'Count the four books that tell the story of Jesus.', options: ['Two', 'Four', 'Twelve'], answer: 1,
+              why: 'There are four Gospels: Matthew, Mark, Luke and John.' },
+            { prompt: 'Which of these is one of the four Gospels?', hint: 'Think of the books that tell the story of Jesus.', options: ['Acts', 'Luke', 'Romans'], answer: 1,
+              why: 'Luke is one of the four Gospels. Acts is a history book, and Romans is a letter.' },
+            { prompt: 'What do the Gospels mainly describe?', hint: 'They tell about one person.', options: ['The life and teaching of Jesus', 'Rules for building a house', 'A list of kings'], answer: 0,
+              why: 'The Gospels describe the life and teaching of Jesus.' }
+          ]
+        }
+      ];
+
+      // John's lines. Short, warm, and never preachy.
+      var JOHN = {
+        hello: "Hi! I'm John. Let's open the book together!",
+        roundStart: ['Here we go!', 'Ready for the next round?', 'New round, same friend!'],
+        cheer: ['Yes! You got it!', 'Wonderful!', 'That is right!', 'Look at you go!', 'Brilliant!'],
+        oops: ['Almost! Read the explanation.', 'No worries, we learn from this.', 'Good try. Here is why.'],
+        end: { perfect: 'Every answer right! You are ready for Monday!', good: 'You know the basics. Nice work!', start: 'Everyone starts here. Let\'s read the answers together!' }
+      };
+
+      var TOTAL = ROUNDS.reduce(function (n, r) { return n + r.questions.length; }, 0);
+      var state = { round: 0, q: 0, score: 0, answered: false, log: [] };
+
+      var $ = function (id) { return document.getElementById(id); };
+      var panels = { start: $('start'), game: $('game'), end: $('end') };
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function pick(list) { return list[Math.floor(Math.random() * list.length)]; }
+
+      function john(el, mood) {
+        el.classList.remove('bob', 'jump', 'wobble');
+        void el.offsetWidth;
+        el.classList.add(mood === 'idle' ? 'bob' : mood);
+      }
+
+      function say(text) { $('john-game-bubble').textContent = text; }
+
+      function show(name) {
+        Object.keys(panels).forEach(function (k) { panels[k].classList.toggle('hidden', k !== name); });
+        panels[name].setAttribute('tabindex', '-1');
+        panels[name].focus({ preventScroll: false });
+        window.scrollTo({ top: 0, behavior: 'auto' });
+      }
+
+      function allIndex() {
+        var n = 0;
+        for (var r = 0; r < state.round; r++) n += ROUNDS[r].questions.length;
+        return n + state.q;
+      }
+
+      function render() {
+        var round = ROUNDS[state.round];
+        var item = round.questions[state.q];
+        var first = state.q === 0;
+        $('round-num').textContent = state.round + 1;
+        $('round-num').style.background = round.color;
+        $('round-label').textContent = 'Round ' + (state.round + 1) + ' of ' + ROUNDS.length + ' · ' + round.name;
+        $('count-label').textContent = 'Question ' + (allIndex() + 1) + ' of ' + TOTAL;
+        $('bar').style.width = (allIndex() / TOTAL * 100) + '%';
+        $('question').textContent = item.prompt;
+        $('hint').textContent = first ? round.intro + ' ' + item.hint : item.hint;
+        say(first ? pick(JOHN.roundStart) : item.hint);
+        var box = $('choices');
+        box.innerHTML = '';
+        box.className = 'choices ' + (item.options.length === 3 ? 'three' : 'two');
+        item.options.forEach(function (text, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.textContent = text;
+          b.addEventListener('click', function () { choose(i); });
+          box.appendChild(b);
+        });
+        var fb = $('feedback');
+        fb.className = 'feedback';
+        fb.textContent = 'Pick an answer to see the explanation.';
+        $('btn-next').disabled = true;
+        $('btn-next').textContent = (allIndex() + 1 === TOTAL) ? 'See my score!' : 'Next';
+        state.answered = false;
+        john($('john-game'), 'bob');
+        var b1 = box.querySelector('button');
+        if (b1) b1.focus();
+      }
+
+      function choose(i) {
+        if (state.answered) return;
+        state.answered = true;
+        var item = ROUNDS[state.round].questions[state.q];
+        var correct = i === item.answer;
+        if (correct) state.score++;
+        state.log.push({ prompt: item.prompt, picked: item.options[i], right: item.options[item.answer], correct: correct, why: item.why });
+        document.querySelectorAll('#choices .choice').forEach(function (b, idx) {
+          b.disabled = true;
+          if (idx === item.answer) b.classList.add('correct');
+          else if (idx === i) b.classList.add('wrong');
+        });
+        var fb = $('feedback');
+        fb.className = 'feedback ' + (correct ? 'good' : 'bad');
+        fb.innerHTML = '';
+        var h = document.createElement('strong');
+        h.textContent = correct ? 'Correct!' : 'Not quite.';
+        fb.appendChild(h);
+        fb.appendChild(document.createTextNode((correct ? '' : 'The answer is "' + item.options[item.answer] + '". ') + item.why));
+        say(correct ? pick(JOHN.cheer) : pick(JOHN.oops));
+        john($('john-game'), correct ? 'jump' : 'wobble');
+        if (correct && !reduce) burst(14);
+        $('btn-next').disabled = false;
+        $('btn-next').focus();
+      }
+
+      function burst(n) {
+        var colors = ['#ffc83d', '#3aa8ff', '#35c28a', '#ff6f61', '#7b5cd6'];
+        for (var i = 0; i < n; i++) {
+          var c = document.createElement('div');
+          c.className = 'confetti';
+          c.style.left = Math.random() * 100 + 'vw';
+          c.style.background = colors[i % colors.length];
+          c.style.animationDuration = (1.6 + Math.random() * 1.2) + 's';
+          c.style.animationDelay = (Math.random() * 0.25) + 's';
+          document.body.appendChild(c);
+          setTimeout(function (el) { el.remove(); }.bind(null, c), 3200);
+        }
+      }
+
+      function next() {
+        var round = ROUNDS[state.round];
+        if (state.q + 1 < round.questions.length) {
+          state.q++;
+        } else if (state.round + 1 < ROUNDS.length) {
+          state.round++;
+          state.q = 0;
+        } else {
+          return finish();
+        }
+        render();
+      }
+
+      function finish() {
+        $('final-score').textContent = state.score;
+        $('final-total').textContent = TOTAL;
+        var pct = state.score / TOTAL;
+        $('end-message').textContent = pct === 1 ? JOHN.end.perfect : pct >= 0.6 ? JOHN.end.good : JOHN.end.start;
+        $('review').classList.add('hidden');
+        show('end');
+        john($('john-end'), 'jump');
+        if (pct >= 0.6 && !reduce) { burst(40); }
+      }
+
+      function review() {
+        var box = $('review');
+        box.innerHTML = '';
+        state.log.forEach(function (row, n) {
+          var p = document.createElement('div');
+          p.className = 'review-item ' + (row.correct ? 'good' : 'bad');
+          var t = document.createElement('strong');
+          t.textContent = (n + 1) + '. ' + row.prompt;
+          p.appendChild(t);
+          p.appendChild(document.createTextNode((row.correct ? 'You chose "' + row.picked + '". ' : 'You chose "' + row.picked + '". The answer is "' + row.right + '". ') + row.why));
+          box.appendChild(p);
+        });
+        box.classList.remove('hidden');
+        box.setAttribute('tabindex', '-1');
+        box.focus();
+      }
+
+      function begin() {
+        state.round = 0; state.q = 0; state.score = 0; state.log = [];
+        show('game');
+        render();
+      }
+
+      $('btn-begin').addEventListener('click', begin);
+      $('btn-next').addEventListener('click', next);
+      $('btn-again').addEventListener('click', begin);
+      $('btn-review').addEventListener('click', review);
+
+      $('john-bubble').textContent = JOHN.hello;
+
+      document.addEventListener('keydown', function (e) {
+        if (panels.game.classList.contains('hidden')) return;
+        if (e.key === 'Enter' && state.answered && !$('btn-next').disabled && document.activeElement !== $('btn-next')) {
+          e.preventDefault(); next();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
