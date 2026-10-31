@@ -240,6 +240,37 @@
     @media (prefers-reduced-motion: reduce) {
       .panel:not(.hidden), .steps li, .choices .choice, .feedback, .review-item, .bubble, .logo-badge, .btn:hover { animation: none !important; }
     }
+
+    /* Story, trail, friends, round-end */
+    .trail { display: flex; gap: 10px; list-style: none; margin: 0 0 16px; padding: 0; align-items: center; }
+    .trail-stop { width: 34px; height: 34px; border-radius: 50%; border: 3px solid var(--ink); background: var(--white); display: grid; place-items: center; font-family: var(--display); font-weight: 700; font-size: 1rem; box-shadow: 0 3px 0 var(--ink); }
+    .trail-stop.done { background: var(--c, var(--sun)); }
+    .trail-stop.current { background: var(--c, var(--sun)); transform: scale(1.18); box-shadow: 0 4px 0 var(--ink), 0 0 0 4px rgba(255,255,255,0.9); }
+    .friends { list-style: none; padding: 0; margin: 0 0 24px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .friend { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px; background: #f2faff; border: 3px solid var(--ink); border-radius: 20px; padding: 10px 6px 12px; font-weight: 800; font-size: .92rem; box-shadow: inset 0 -5px 0 rgba(27,42,74,0.1), 0 5px 0 var(--ink); transition: transform .2s ease; }
+    .friend:hover { transform: translateY(-3px) rotate(-1deg); }
+    .friend svg { width: 76px; height: 76px; overflow: visible; }
+    .friend small { font-weight: 700; color: var(--ink-soft); font-size: .8rem; line-height: 1.25; }
+    .friend-stars { color: var(--sun-deep); font-size: 1.2rem; letter-spacing: 2px; text-shadow: 0 1px 0 var(--ink); }
+    .friends--end { grid-template-columns: repeat(5, 1fr); margin: 22px 0; }
+    .friends--end .friend svg { width: 64px; height: 64px; }
+    .story-card, .roundend-card { text-align: center; max-width: 640px; margin: 0 auto; }
+    .story-card .john, .roundend-card .john { width: 190px; margin: 0 auto 6px; }
+    .story-card h2, .roundend-card h2 { font-size: clamp(2rem, 5vw, 2.8rem); }
+    .story-text { font-size: 1.25rem; font-weight: 700; color: var(--ink-soft); line-height: 1.55; margin: 0 auto 26px; max-width: 54ch; }
+    .stars-big { font-size: clamp(2.6rem, 8vw, 4rem); color: var(--sun); letter-spacing: 6px; text-shadow: 0 3px 0 var(--ink); margin: 6px 0; line-height: 1.1; }
+    .badge-pill { display: inline-block; background: var(--sun); border: 3px solid var(--ink); border-radius: 999px; padding: 8px 18px; font-family: var(--display); font-weight: 700; box-shadow: 0 4px 0 var(--ink); margin: 6px 0 16px; }
+    .s5 .step-n { background: #d9c9ff; }
+    .steps li { grid-column: auto; }
+    @media (max-width: 599px) {
+      .friends { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .friends--end { grid-template-columns: repeat(2, 1fr); }
+      .friend svg { width: 64px; height: 64px; }
+      .story-card .john, .roundend-card .john { width: 140px; }
+      .story-text { font-size: 1.08rem; }
+      .trail-stop { width: 30px; height: 30px; font-size: .9rem; }
+      .trail { gap: 8px; margin-bottom: 12px; }
+    }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
       .cloud, .confetti { display: none; }
@@ -309,13 +340,21 @@
 
         <span class="eyebrow">A game for beginners</span>
         <h1 id="start-title" class="hero-title">Open the Book</h1>
-        <p class="lead">Four bouncy little rounds about how the Bible is put together. No experience needed, and every answer comes with a friendly explanation from John.</p>
+        <p class="lead">Five bouncy little rounds about how the Bible is put together, each with its own short story and a new friend. No experience needed, and every answer comes with a friendly explanation.</p>
+
+        <ul class="friends" aria-label="Meet your friends">
+          <li class="friend"><svg viewBox="0 0 200 200" aria-hidden="true"><use href="#john-art"/></svg><strong>John</strong><small>Your guide</small></li>
+          <li class="friend"><svg viewBox="0 0 200 200" aria-hidden="true"><use href="#pip-art"/></svg><strong>Pip</strong><small>The dove</small></li>
+          <li class="friend"><svg viewBox="0 0 200 200" aria-hidden="true"><use href="#hazel-art"/></svg><strong>Hazel</strong><small>The owl</small></li>
+          <li class="friend"><svg viewBox="0 0 200 200" aria-hidden="true"><use href="#leo-art"/></svg><strong>Leo</strong><small>The lion cub</small></li>
+        </ul>
 
         <ol class="steps">
           <li class="s1"><span class="step-n">1</span><span><strong>Two parts</strong><br>Sort books into the first and second parts.</span></li>
           <li class="s2"><span class="step-n">2</span><span><strong>Find the address</strong><br>How "John 3:16" works.</span></li>
           <li class="s3"><span class="step-n">3</span><span><strong>Words you will hear</strong><br>Match church words to plain meanings.</span></li>
           <li class="s4"><span class="step-n">4</span><span><strong>The four Gospels</strong><br>Meet the first four books of the New Testament.</span></li>
+          <li class="s5"><span class="step-n">5</span><span><strong>Quick fire</strong><br>True or false with all your friends.</span></li>
         </ol>
 
         <div class="row">
@@ -328,10 +367,12 @@
       <section id="game" class="panel hidden" aria-live="off">
         <div class="talk">
           <div class="john bob" id="john-game" data-john>
-            <svg viewBox="0 0 200 200" role="img" aria-label="John the lamb"><use href="#john-art"/></svg>
+            <svg id="game-svg" viewBox="0 0 200 200" role="img" aria-label="John the lamb"><use id="game-use" href="#john-art"/></svg>
           </div>
           <div class="bubble" id="john-game-bubble" aria-live="polite"></div>
         </div>
+
+        <ol class="trail" id="trail" aria-label="Your trail"></ol>
 
         <div class="game-head">
           <span class="round-pill"><span class="round-num" id="round-num">1</span><span id="round-label">Round 1 of 4</span></span>
@@ -348,6 +389,34 @@
         </div>
       </section>
 
+      <!-- STORY -->
+      <section id="story" class="panel hidden" aria-labelledby="story-title">
+        <div class="story-card">
+          <div class="john bob" id="story-char">
+            <svg id="story-svg" viewBox="0 0 200 200" role="img" aria-label="John the lamb"><use id="story-use" href="#john-art"/></svg>
+          </div>
+          <span class="eyebrow" id="story-eyebrow">Story 1</span>
+          <h2 id="story-title"></h2>
+          <p class="story-text" id="story-text"></p>
+          <button class="btn" id="btn-story-go" type="button">Start the round</button>
+        </div>
+      </section>
+
+      <!-- ROUND END -->
+      <section id="roundend" class="panel hidden" aria-labelledby="re-title">
+        <div class="roundend-card">
+          <div class="john jump" id="re-char">
+            <svg id="re-svg" viewBox="0 0 200 200" role="img" aria-label="John the lamb"><use id="re-use" href="#john-art"/></svg>
+          </div>
+          <h2 id="re-title"></h2>
+          <div class="stars-big" id="re-stars" role="img"></div>
+          <p class="lead" id="re-score" style="margin:0 auto 4px"></p>
+          <span class="badge-pill" id="re-badge"></span>
+          <p class="lead" id="re-msg" style="margin:0 auto 22px"></p>
+          <button class="btn" id="btn-roundnext" type="button">Next story</button>
+        </div>
+      </section>
+
       <!-- END -->
       <section id="end" class="panel final hidden" aria-labelledby="end-title">
         <div class="trophy john jump" id="john-end">
@@ -357,6 +426,8 @@
         <h2 id="end-title">Great job!</h2>
         <div class="big-score"><span id="final-score">0</span><small> / <span id="final-total">21</span></small></div>
         <p id="end-message" class="lead" style="margin:0 auto 6px"></p>
+
+        <ul class="friends friends--end" id="friends-end" aria-label="Your friends and stars"></ul>
 
         <div class="lessons">
           <h3 style="font-size:1.4rem">What you learned</h3>
@@ -408,14 +479,94 @@
       <path d="M62 152 L89 168 L116 152" fill="#fff" stroke="#1b2a4a" stroke-width="5" stroke-linejoin="round"/>
       <path d="M89 152v40" stroke="#1b2a4a" stroke-width="4"/>
     </symbol>
+
+    <symbol id="pip-art" viewBox="0 0 200 200">
+      <ellipse cx="100" cy="190" rx="60" ry="8" fill="#1b2a4a" opacity=".15"/>
+      <g stroke="#1b2a4a" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M150 148 L186 168 L146 170 Z" fill="#dff1ff"/>
+        <ellipse cx="100" cy="122" rx="58" ry="52" fill="#fff"/>
+        <ellipse cx="116" cy="126" rx="30" ry="21" fill="#dff1ff" transform="rotate(-18 116 126)"/>
+        <circle cx="86" cy="72" r="36" fill="#fff"/>
+        <path d="M84 38 q-8 -14 6 -18 q-3 10 10 12" fill="#fff"/>
+        <path d="M58 70 L38 78 L58 86 Z" fill="#ffb347"/>
+        <path d="M86 172 v14 M116 172 v14" fill="none" stroke="#ffb347" stroke-width="7"/>
+      </g>
+      <circle cx="84" cy="66" r="5.5" fill="#1b2a4a"/>
+      <circle cx="86" cy="64" r="1.8" fill="#fff"/>
+      <circle cx="76" cy="82" r="6" fill="#ff8fa3" opacity=".8"/>
+    </symbol>
+    <symbol id="hazel-art" viewBox="0 0 200 200">
+      <ellipse cx="100" cy="190" rx="60" ry="8" fill="#1b2a4a" opacity=".15"/>
+      <g stroke="#1b2a4a" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+        <ellipse cx="42" cy="128" rx="15" ry="34" fill="#a47849" transform="rotate(10 42 128)"/>
+        <ellipse cx="158" cy="128" rx="15" ry="34" fill="#a47849" transform="rotate(-10 158 128)"/>
+        <ellipse cx="100" cy="124" rx="56" ry="58" fill="#b98b5e"/>
+        <ellipse cx="100" cy="140" rx="34" ry="36" fill="#f3dfc2"/>
+        <path d="M58 54 L50 22 L84 44 Z" fill="#b98b5e"/>
+        <path d="M142 54 L150 22 L116 44 Z" fill="#b98b5e"/>
+        <ellipse cx="100" cy="80" rx="50" ry="42" fill="#b98b5e"/>
+        <circle cx="78" cy="80" r="19" fill="#fff"/>
+        <circle cx="122" cy="80" r="19" fill="#fff"/>
+        <path d="M92 94 L108 94 L100 108 Z" fill="#ffb347"/>
+        <path d="M82 184 v-10 M118 184 v-10" fill="none" stroke="#ffb347" stroke-width="7"/>
+      </g>
+      <circle cx="80" cy="82" r="8" fill="#1b2a4a"/>
+      <circle cx="120" cy="82" r="8" fill="#1b2a4a"/>
+      <circle cx="83" cy="79" r="2.4" fill="#fff"/>
+      <circle cx="123" cy="79" r="2.4" fill="#fff"/>
+      <circle cx="58" cy="100" r="6" fill="#ff8fa3" opacity=".8"/>
+      <circle cx="142" cy="100" r="6" fill="#ff8fa3" opacity=".8"/>
+    </symbol>
+    <symbol id="leo-art" viewBox="0 0 200 200">
+      <ellipse cx="100" cy="190" rx="58" ry="8" fill="#1b2a4a" opacity=".15"/>
+      <g stroke="#1b2a4a" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+        <circle cx="158" cy="100" r="22" fill="#ffb347"/><circle cx="141" cy="141" r="22" fill="#ffb347"/>
+        <circle cx="100" cy="158" r="22" fill="#ffb347"/><circle cx="59" cy="141" r="22" fill="#ffb347"/>
+        <circle cx="42" cy="100" r="22" fill="#ffb347"/><circle cx="59" cy="59" r="22" fill="#ffb347"/>
+        <circle cx="100" cy="42" r="22" fill="#ffb347"/><circle cx="141" cy="59" r="22" fill="#ffb347"/>
+        <circle cx="100" cy="100" r="62" fill="#ffb347" stroke="none"/>
+        <ellipse cx="78" cy="180" rx="16" ry="10" fill="#ffd98c"/>
+        <ellipse cx="122" cy="180" rx="16" ry="10" fill="#ffd98c"/>
+        <circle cx="100" cy="102" r="46" fill="#ffd98c"/>
+        <circle cx="64" cy="64" r="13" fill="#ffd98c"/><circle cx="136" cy="64" r="13" fill="#ffd98c"/>
+        <path d="M92 114 h16 l-8 9 z" fill="#ff8fa3"/>
+        <path d="M100 123 v6 q-8 8 -14 2 M100 129 q8 8 14 2" fill="none"/>
+      </g>
+      <circle cx="64" cy="64" r="5" fill="#ff8fa3"/><circle cx="136" cy="64" r="5" fill="#ff8fa3"/>
+      <circle cx="84" cy="98" r="5.5" fill="#1b2a4a"/><circle cx="116" cy="98" r="5.5" fill="#1b2a4a"/>
+      <circle cx="86" cy="96" r="1.8" fill="#fff"/><circle cx="118" cy="96" r="1.8" fill="#fff"/>
+      <circle cx="72" cy="112" r="6" fill="#ff8fa3" opacity=".7"/><circle cx="128" cy="112" r="6" fill="#ff8fa3" opacity=".7"/>
+    </symbol>
   </svg>
 
   <script>
     (function () {
-      // Content is unchanged from the first version. Only presentation has changed.
+      // Characters. Each host has a voice, and an artwork symbol defined in the sprite below.
+      var CHARS = {
+        john: { art: 'john-art', name: 'John the lamb',
+          start: ["Here we go!", "Ready for the next round?", "New round, same friend!"],
+          cheer: ['Yes! You got it!', 'Wonderful!', 'That is right!', 'Look at you go!', 'Brilliant!'],
+          oops: ['Almost! Read the explanation.', 'No worries, we learn from this.', 'Good try. Here is why.'] },
+        pip: { art: 'pip-art', name: 'Pip the dove',
+          start: ["Tweet tweet! Let's fly through this one!", "Pip is ready. Are you?"],
+          cheer: ['Tweet tweet! Correct!', 'You soared through that one!', 'Pip is so proud!'],
+          oops: ['Oops! Pip gets mixed up too.', 'Shake it off! Read why.', 'Nearly! Check the explanation.'] },
+        hazel: { art: 'hazel-art', name: 'Hazel the owl',
+          start: ["Hoot hoot! Time to find the address.", "Hazel loves this part!"],
+          cheer: ['Hoot! Very wise!', 'Exactly right!', 'Hazel is impressed!'],
+          oops: ['Hoo knew? Read why.', 'Close! Let me explain.', 'A wise owl learns from every try.'] },
+        leo: { art: 'leo-art', name: 'Leo the lion cub',
+          start: ["Roar! Let's learn some big words.", "Leo is ready!"],
+          cheer: ['Roar! You got it!', 'Brave answer, and correct!', 'Leo does a happy dance!'],
+          oops: ['Grrr, tricky one! Read why.', "That's okay! Leo mixes these up too.", 'Good try, brave friend.'] }
+      };
+
+      // Content is the same questions as before, plus a short story for each round and a new quick-fire round.
       var ROUNDS = [
         {
-          name: 'Two parts', color: '#ffd65e',
+          name: 'Two parts', color: '#ffd65e', host: 'pip', badge: 'Two Parts Pin',
+          storyTitle: 'Pip finds a very big book',
+          story: "Pip the dove found a huge old book in the library. \"It has two halves!\" Pip chirped. The first half is called the Old Testament, and the second half is called the New Testament. Can you help Pip tell which books belong where?",
           intro: 'Choose which part of the Bible each book belongs to.',
           questions: [
             { prompt: 'Genesis', hint: 'Often the first book in the Bible.', options: ['Old Testament', 'New Testament'], answer: 0,
@@ -433,7 +584,9 @@
           ]
         },
         {
-          name: 'Find the address', color: '#9be3c2',
+          name: 'Find the address', color: '#9be3c2', host: 'hazel', badge: 'Address Finder',
+          storyTitle: 'Hazel and the map of verses',
+          story: "Hazel the owl loves maps and addresses. \"Every verse has an address,\" she hooted. \"First the book, then the chapter, then the verse.\" Come and practice finding the right spot with Hazel.",
           intro: 'A Bible reference works like an address: book, then chapter, then verse.',
           questions: [
             { prompt: 'In John 3:16, which number is the chapter?', hint: 'Read the reference from left to right.', options: ['John', '3', '16'], answer: 1,
@@ -451,7 +604,9 @@
           ]
         },
         {
-          name: 'Words you will hear', color: '#b8e4ff',
+          name: 'Words you will hear', color: '#b8e4ff', host: 'leo', badge: 'Word Explorer',
+          storyTitle: 'Leo and the big words',
+          story: "Leo the lion cub keeps hearing big words at Bible study, like gospel and psalm. \"What do they mean?\" he roared, very softly. Let's help Leo learn the plain meanings.",
           intro: 'Match each word to its plain meaning. These words appear often in Bible study.',
           questions: [
             { prompt: 'Gospel', hint: 'Used for the first four books of the New Testament.', options: ['Good news', 'A long journey', 'A house of prayer'], answer: 0,
@@ -467,7 +622,9 @@
           ]
         },
         {
-          name: 'The four Gospels', color: '#ffb8ad',
+          name: 'The four Gospels', color: '#ffb8ad', host: 'john', badge: 'Gospel Guide',
+          storyTitle: 'John\'s favorite shelf',
+          story: "John the lamb has a favorite shelf in the library: the four Gospels. They are the first four books of the New Testament, and they tell about the life and teaching of Jesus. Let's go meet them together.",
           intro: 'The first four books of the New Testament are called the Gospels.',
           questions: [
             { prompt: 'Which book comes first in the New Testament?', hint: 'It is the first book after the Old Testament.', options: ['Matthew', 'Mark', 'John'], answer: 0,
@@ -479,33 +636,43 @@
             { prompt: 'What do the Gospels mainly describe?', hint: 'They tell about one person.', options: ['The life and teaching of Jesus', 'Rules for building a house', 'A list of kings'], answer: 0,
               why: 'The Gospels describe the life and teaching of Jesus.' }
           ]
+        },
+        {
+          name: 'Quick fire', color: '#d9c9ff', host: 'john', badge: 'Quick Fire Star',
+          storyTitle: 'Quick fire with all the friends',
+          story: "All the friends are cheering you on! This last round is quick: just say true or false. Everything here is something you already met on the way.",
+          intro: 'Is each sentence true or false?',
+          questions: [
+            { prompt: 'The Bible has two main parts.', hint: 'Think of Pip and the big book.', options: ['True', 'False'], answer: 0,
+              why: 'True. The two main parts are the Old Testament and the New Testament.' },
+            { prompt: 'In John 3:16, the number 16 is the chapter.', hint: 'Remember Hazel\'s address.', options: ['True', 'False'], answer: 1,
+              why: 'False. 16 is the verse. The chapter is 3.' },
+            { prompt: 'Psalms is a collection of songs and prayers.', hint: 'It is in the Old Testament.', options: ['True', 'False'], answer: 0,
+              why: 'True. The book of Psalms is a collection of songs and prayers.' },
+            { prompt: 'The four Gospels are Matthew, Mark, Luke and John.', hint: 'The first four books of the New Testament.', options: ['True', 'False'], answer: 0,
+              why: 'True. Those are the four Gospels.' },
+            { prompt: 'An epistle is a kind of song.', hint: 'Leo learned this one.', options: ['True', 'False'], answer: 1,
+              why: 'False. An epistle is a letter.' }
+          ]
         }
       ];
 
-      // John's lines. Short, warm, and never preachy.
-      var JOHN = {
-        hello: "Hi! I'm John. Let's open the book together!",
-        roundStart: ['Here we go!', 'Ready for the next round?', 'New round, same friend!'],
-        cheer: ['Yes! You got it!', 'Wonderful!', 'That is right!', 'Look at you go!', 'Brilliant!'],
-        oops: ['Almost! Read the explanation.', 'No worries, we learn from this.', 'Good try. Here is why.'],
-        end: { perfect: 'Every answer right! You are ready for Monday!', good: 'You know the basics. Nice work!', start: 'Everyone starts here. Let\'s read the answers together!' }
-      };
-
       var TOTAL = ROUNDS.reduce(function (n, r) { return n + r.questions.length; }, 0);
-      var state = { round: 0, q: 0, score: 0, answered: false, log: [] };
+      var state = { round: 0, q: 0, score: 0, roundScore: [], answered: false, log: [] };
 
       var $ = function (id) { return document.getElementById(id); };
-      var panels = { start: $('start'), game: $('game'), end: $('end') };
+      var panels = { start: $('start'), story: $('story'), game: $('game'), roundend: $('roundend'), end: $('end') };
       var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       function pick(list) { return list[Math.floor(Math.random() * list.length)]; }
+      function host() { return CHARS[ROUNDS[state.round].host]; }
+      function setArt(useEl, id) { useEl.setAttribute('href', '#' + id); }
 
-      function john(el, mood) {
+      function mood(el, m) {
         el.classList.remove('bob', 'jump', 'wobble');
         void el.offsetWidth;
-        el.classList.add(mood === 'idle' ? 'bob' : mood);
+        el.classList.add(m === 'idle' ? 'bob' : m);
       }
-
       function say(text) { $('john-game-bubble').textContent = text; }
 
       function show(name) {
@@ -521,10 +688,52 @@
         return n + state.q;
       }
 
+      function starsFor(correct, total) {
+        var p = correct / total;
+        return p >= 0.9 ? 3 : p >= 0.6 ? 2 : 1;   // everyone earns at least one star
+      }
+      function starText(n) { return '★'.repeat(n) + '☆'.repeat(3 - n); }
+
+      function buildTrail() {
+        var t = $('trail');
+        t.innerHTML = '';
+        ROUNDS.forEach(function (r, i) {
+          var li = document.createElement('li');
+          li.className = 'trail-stop' + (i < state.round ? ' done' : i === state.round ? ' current' : '');
+          li.style.setProperty('--c', r.color);
+          li.setAttribute('aria-label', 'Round ' + (i + 1) + ': ' + r.name + (i < state.round ? ', finished' : i === state.round ? ', now' : ''));
+          li.textContent = i + 1;
+          t.appendChild(li);
+        });
+      }
+
+      // STORY screen, shown before each round
+      function showStory() {
+        var round = ROUNDS[state.round];
+        var h = CHARS[round.host];
+        setArt($('story-use'), h.art);
+        $('story-svg').setAttribute('aria-label', h.name);
+        $('story-eyebrow').textContent = 'Story ' + (state.round + 1) + ' of ' + ROUNDS.length;
+        $('story-title').textContent = round.storyTitle;
+        $('story-text').textContent = round.story;
+        mood($('story-char'), 'bob');
+        show('story');
+      }
+
+      function startRound() {
+        state.q = 0;
+        show('game');
+        render();
+      }
+
       function render() {
         var round = ROUNDS[state.round];
         var item = round.questions[state.q];
         var first = state.q === 0;
+        var h = host();
+        setArt($('game-use'), h.art);
+        $('game-svg').setAttribute('aria-label', h.name);
+        buildTrail();
         $('round-num').textContent = state.round + 1;
         $('round-num').style.background = round.color;
         $('round-label').textContent = 'Round ' + (state.round + 1) + ' of ' + ROUNDS.length + ' · ' + round.name;
@@ -532,7 +741,7 @@
         $('bar').style.width = (allIndex() / TOTAL * 100) + '%';
         $('question').textContent = item.prompt;
         $('hint').textContent = first ? round.intro + ' ' + item.hint : item.hint;
-        say(first ? pick(JOHN.roundStart) : item.hint);
+        say(first ? pick(h.start) : item.hint);
         var box = $('choices');
         box.innerHTML = '';
         box.className = 'choices ' + (item.options.length === 3 ? 'three' : 'two');
@@ -548,9 +757,9 @@
         fb.className = 'feedback';
         fb.textContent = 'Pick an answer to see the explanation.';
         $('btn-next').disabled = true;
-        $('btn-next').textContent = (allIndex() + 1 === TOTAL) ? 'See my score!' : 'Next';
+        $('btn-next').textContent = (state.q + 1 === round.questions.length) ? 'Finish round' : 'Next';
         state.answered = false;
-        john($('john-game'), 'bob');
+        mood($('john-game'), 'bob');
         var b1 = box.querySelector('button');
         if (b1) b1.focus();
       }
@@ -558,9 +767,11 @@
       function choose(i) {
         if (state.answered) return;
         state.answered = true;
-        var item = ROUNDS[state.round].questions[state.q];
+        var round = ROUNDS[state.round];
+        var item = round.questions[state.q];
+        var h = host();
         var correct = i === item.answer;
-        if (correct) state.score++;
+        if (correct) { state.score++; state.roundScore[state.round] = (state.roundScore[state.round] || 0) + 1; }
         state.log.push({ prompt: item.prompt, picked: item.options[i], right: item.options[item.answer], correct: correct, why: item.why });
         document.querySelectorAll('#choices .choice').forEach(function (b, idx) {
           b.disabled = true;
@@ -570,12 +781,12 @@
         var fb = $('feedback');
         fb.className = 'feedback ' + (correct ? 'good' : 'bad');
         fb.innerHTML = '';
-        var h = document.createElement('strong');
-        h.textContent = correct ? 'Correct!' : 'Not quite.';
-        fb.appendChild(h);
+        var s = document.createElement('strong');
+        s.textContent = correct ? 'Correct!' : 'Not quite.';
+        fb.appendChild(s);
         fb.appendChild(document.createTextNode((correct ? '' : 'The answer is "' + item.options[item.answer] + '". ') + item.why));
-        say(correct ? pick(JOHN.cheer) : pick(JOHN.oops));
-        john($('john-game'), correct ? 'jump' : 'wobble');
+        say(correct ? pick(h.cheer) : pick(h.oops));
+        mood($('john-game'), correct ? 'jump' : 'wobble');
         if (correct && !reduce) burst(14);
         $('btn-next').disabled = false;
         $('btn-next').focus();
@@ -597,26 +808,68 @@
 
       function next() {
         var round = ROUNDS[state.round];
-        if (state.q + 1 < round.questions.length) {
-          state.q++;
-        } else if (state.round + 1 < ROUNDS.length) {
-          state.round++;
-          state.q = 0;
-        } else {
-          return finish();
-        }
-        render();
+        if (state.q + 1 < round.questions.length) { state.q++; render(); }
+        else roundEnd();
+      }
+
+      // ROUND END screen: stars and a sticker from the host
+      function roundEnd() {
+        var round = ROUNDS[state.round];
+        var h = CHARS[round.host];
+        var got = state.roundScore[state.round] || 0;
+        var total = round.questions.length;
+        var stars = starsFor(got, total);
+        setArt($('re-use'), h.art);
+        $('re-svg').setAttribute('aria-label', h.name);
+        $('re-title').textContent = round.name + ' done!';
+        $('re-stars').textContent = starText(stars);
+        $('re-stars').setAttribute('aria-label', stars + ' out of 3 stars');
+        $('re-score').textContent = 'You got ' + got + ' of ' + total + '.';
+        $('re-badge').textContent = round.badge + ' collected';
+        $('re-msg').textContent = stars === 3 ? h.name.split(' ')[0] + ' is cheering for you!' : stars === 2 ? 'Nice work! Almost all of them.' : 'Good effort! Every round makes it easier.';
+        var last = state.round + 1 === ROUNDS.length;
+        $('btn-roundnext').textContent = last ? 'See my score' : 'Next story';
+        mood($('re-char'), 'jump');
+        show('roundend');
+        if (stars >= 2 && !reduce) burst(24);
+      }
+
+      function afterRound() {
+        if (state.round + 1 < ROUNDS.length) { state.round++; showStory(); }
+        else finish();
       }
 
       function finish() {
         $('final-score').textContent = state.score;
         $('final-total').textContent = TOTAL;
         var pct = state.score / TOTAL;
-        $('end-message').textContent = pct === 1 ? JOHN.end.perfect : pct >= 0.6 ? JOHN.end.good : JOHN.end.start;
+        $('end-message').textContent = pct === 1 ? 'Every answer right! You are ready for Monday!' : pct >= 0.6 ? 'You know the basics. Nice work!' : "Everyone starts here. Let's read the answers together!";
+        var box = $('friends-end');
+        box.innerHTML = '';
+        ROUNDS.forEach(function (r, i) {
+          var h = CHARS[r.host];
+          var got = state.roundScore[i] || 0;
+          var li = document.createElement('li');
+          li.className = 'friend';
+          var svgNS = 'http://www.w3.org/2000/svg';
+          var svg = document.createElementNS(svgNS, 'svg');
+          svg.setAttribute('viewBox', '0 0 200 200');
+          svg.setAttribute('aria-hidden', 'true');
+          var use = document.createElementNS(svgNS, 'use');
+          use.setAttribute('href', '#' + h.art);
+          svg.appendChild(use);
+          var name = document.createElement('strong');
+          name.textContent = r.badge;
+          var st = document.createElement('span');
+          st.className = 'friend-stars';
+          st.textContent = starText(starsFor(got, r.questions.length));
+          li.appendChild(svg); li.appendChild(name); li.appendChild(st);
+          box.appendChild(li);
+        });
         $('review').classList.add('hidden');
         show('end');
-        john($('john-end'), 'jump');
-        if (pct >= 0.6 && !reduce) { burst(40); }
+        mood($('john-end'), 'jump');
+        if (pct >= 0.6 && !reduce) burst(40);
       }
 
       function review() {
@@ -637,17 +890,18 @@
       }
 
       function begin() {
-        state.round = 0; state.q = 0; state.score = 0; state.log = [];
-        show('game');
-        render();
+        state.round = 0; state.q = 0; state.score = 0; state.roundScore = []; state.log = [];
+        showStory();
       }
 
       $('btn-begin').addEventListener('click', begin);
+      $('btn-story-go').addEventListener('click', startRound);
       $('btn-next').addEventListener('click', next);
+      $('btn-roundnext').addEventListener('click', afterRound);
       $('btn-again').addEventListener('click', begin);
       $('btn-review').addEventListener('click', review);
 
-      $('john-bubble').textContent = JOHN.hello;
+      $('john-bubble').textContent = "Hi! I'm John. Let's open the book together!";
 
       document.addEventListener('keydown', function (e) {
         if (panels.game.classList.contains('hidden')) return;
