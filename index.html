@@ -200,7 +200,8 @@
 
     /* Puffy, cute finish. Soft highlights make the chunky shapes feel inflated. */
     .panel { background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%); }
-    .panel::before { content: ''; position: absolute; top: 10px; left: 18px; right: 18px; height: 22%; border-radius: 22px 22px 60% 60%; background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0)); pointer-events: none; }
+    .panel { isolation: isolate; }
+    .panel::before { z-index: -1; content: ''; position: absolute; top: 10px; left: 18px; right: 18px; height: 22%; border-radius: 22px 22px 60% 60%; background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0)); pointer-events: none; }
     .btn, .choice, .steps li, .bubble, .eyebrow, .meet-pill, .round-pill, .count-pill, .feedback { box-shadow: inset 0 -5px 0 rgba(27,42,74,0.12), 0 6px 0 var(--ink); }
     .btn:active, .choice:active:not(:disabled) { box-shadow: inset 0 -2px 0 rgba(27,42,74,0.12), 0 1px 0 var(--ink); }
     .hero-title { letter-spacing: 0.5px; }
