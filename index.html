@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>Open the Book · A Beginner's Bible Game</title>
   <meta name="description" content="A bright, friendly game for people new to the Bible. No experience needed. Meet John the lamb.">
   <meta name="theme-color" content="#7fcfff">
@@ -271,6 +271,135 @@
       .trail-stop { width: 30px; height: 30px; font-size: .9rem; }
       .trail { gap: 8px; margin-bottom: 12px; }
     }
+
+    /* Mobile hardening: touch behaviour, notch safe areas, iOS-safe background, comfortable targets. */
+    html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+    button, a, .choice, .btn { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+    .panel:focus, .panel:focus-visible, #review:focus { outline: none; }
+    header.top { padding-left: max(28px, env(safe-area-inset-left)); padding-right: max(28px, env(safe-area-inset-right)); padding-top: max(18px, env(safe-area-inset-top)); }
+    main.wrap { padding-left: max(20px, env(safe-area-inset-left)); padding-right: max(20px, env(safe-area-inset-right)); }
+    footer.foot { padding-bottom: max(22px, env(safe-area-inset-bottom)); }
+    .logo { min-height: 44px; }
+    .friend small { font-size: 0.875rem; }
+    @media (max-width: 899px) {
+      /* iOS Safari ignores or mishandles fixed backgrounds, so let it scroll with the page. */
+      body { background-attachment: scroll; min-height: 100dvh; }
+    }
+    @media (max-width: 599px) {
+      header.top { padding-left: max(14px, env(safe-area-inset-left)); padding-right: max(14px, env(safe-area-inset-right)); padding-top: max(12px, env(safe-area-inset-top)); }
+      main.wrap { padding-left: max(12px, env(safe-area-inset-left)); padding-right: max(12px, env(safe-area-inset-right)); }
+      .meet-pill { font-size: 0.875rem; }
+    }
+
+    /* Loading screen: a flipping book and bouncing dots */
+    .loader { text-align: center; padding: 14px 0 8px; cursor: pointer; }
+    .loader .john { width: 170px; margin: 0 auto 10px; }
+    .loader h2 { font-size: clamp(1.8rem, 5vw, 2.4rem); margin: 18px 0 6px; }
+    .book { position: relative; width: 150px; height: 92px; margin: 0 auto; perspective: 500px; }
+    .book::before, .book::after { content: ''; position: absolute; top: 0; width: 50%; height: 100%; background: var(--sun); border: 3px solid var(--ink); box-shadow: inset 0 -5px 0 rgba(27,42,74,0.14), 0 5px 0 var(--ink); }
+    .book::before { left: 0; border-radius: 12px 0 0 12px; }
+    .book::after { right: 0; border-radius: 0 12px 12px 0; }
+    .page { position: absolute; left: 50%; top: 6px; width: 46%; height: calc(100% - 12px); background: var(--white); border: 3px solid var(--ink); border-radius: 0 8px 8px 0; transform-origin: left center; z-index: 2; animation: flip 1.35s ease-in-out infinite; }
+    .page.p2 { animation-delay: .22s; } .page.p3 { animation-delay: .44s; }
+    .dots i { display: inline-block; width: 10px; height: 10px; margin-left: 6px; border-radius: 50%; background: var(--ink); animation: dotbounce 1s ease-in-out infinite; }
+    .dots i:nth-child(2) { animation-delay: .15s; } .dots i:nth-child(3) { animation-delay: .3s; }
+    @keyframes flip { 0% { transform: rotateY(0deg); } 55% { transform: rotateY(-170deg); } 100% { transform: rotateY(-170deg); } }
+    @keyframes dotbounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-8px); } }
+    @media (prefers-reduced-motion: reduce) { .page, .dots i { animation: none !important; } }
+    @media (max-width: 599px) { .loader .john { width: 130px; } .book { width: 124px; height: 78px; } }
+
+    /* Logo: a friendly cartoon on a light sky badge */
+    .logo-badge { background: #cfe9ff; overflow: hidden; }
+    .logo-badge svg { width: 46px; height: 46px; margin-top: 4px; }
+    @media (max-width: 599px) { .logo-badge svg { width: 36px; height: 36px; margin-top: 3px; } }
+
+    /* Victory dance: hop, sway and squish, with music notes drifting up */
+    .john { position: relative; }
+    .john.dance svg { animation: dance 1.2s ease-in-out; transform-origin: 50% 100%; }
+    @keyframes dance {
+      0%   { transform: translateY(0) rotate(0) scale(1, 1); }
+      10%  { transform: translateY(-16px) rotate(-10deg) scale(.97, 1.04); }
+      22%  { transform: translateY(0) rotate(0) scale(1.07, .93); }
+      34%  { transform: translateY(-16px) rotate(10deg) scale(.97, 1.04); }
+      46%  { transform: translateY(0) rotate(0) scale(1.07, .93); }
+      58%  { transform: translateY(-12px) rotate(-8deg) scale(.98, 1.03); }
+      70%  { transform: translateY(0) rotate(0) scale(1.05, .95); }
+      82%  { transform: translateY(-12px) rotate(8deg) scale(.98, 1.03); }
+      100% { transform: translateY(0) rotate(0) scale(1, 1); }
+    }
+    .note { position: absolute; top: 6%; font-family: var(--display); font-weight: 700; font-size: 1.7rem; color: var(--ink); text-shadow: 0 2px 0 var(--sun); pointer-events: none; opacity: 0; animation: noteup 1.3s ease-out forwards; }
+    .note:nth-of-type(1) { left: 6%; } .note:nth-of-type(2) { left: 50%; animation-delay: .15s; } .note:nth-of-type(3) { right: 4%; animation-delay: .3s; }
+    @keyframes noteup { 0% { opacity: 0; transform: translateY(14px) rotate(-8deg); } 25% { opacity: 1; } 100% { opacity: 0; transform: translateY(-46px) rotate(10deg); } }
+    @media (prefers-reduced-motion: reduce) { .john.dance svg, .note { animation: none !important; } .note { display: none; } }
+
+    /* Navigation: back buttons, clickable logo, and the leave-game dialog */
+    .logo { cursor: pointer; }
+    .logo:hover .logo-badge { transform: rotate(-4deg) scale(1.05); }
+    .logo-badge { transition: transform .2s ease; }
+    .back-btn { appearance: none; display: inline-flex; align-items: center; gap: 6px; min-height: 46px; padding: 8px 18px 8px 14px; margin: 0 0 14px; background: var(--white); color: var(--ink); border: 3px solid var(--ink); border-radius: 999px; font-family: var(--display); font-weight: 600; font-size: 1.05rem; cursor: pointer; box-shadow: inset 0 -4px 0 rgba(27,42,74,0.1), 0 4px 0 var(--ink); transition: transform .12s ease, box-shadow .12s ease, background-color .2s; touch-action: manipulation; }
+    .back-btn:hover { background: #eef8ff; }
+    .back-btn:active { transform: translateY(3px); box-shadow: inset 0 -2px 0 rgba(27,42,74,0.1), 0 1px 0 var(--ink); }
+    .modal { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 20px; background: rgba(27,42,74,0.55); }
+    .modal-card { background: var(--white); border: 4px solid var(--ink); border-radius: var(--radius); box-shadow: 0 10px 0 var(--ink); padding: 26px; max-width: 460px; width: 100%; text-align: center; animation: puff .3s cubic-bezier(.3,1.4,.5,1) both; }
+    .modal-card h2 { font-size: 1.9rem; }
+    .modal-card p { font-weight: 700; color: var(--ink-soft); font-size: 1.1rem; margin-bottom: 20px; }
+    .modal-card .row { justify-content: center; }
+    @media (max-width: 599px) {
+      .back-btn { font-size: 1rem; margin-bottom: 10px; }
+      .modal-card { padding: 20px 16px; }
+      .modal-card .row { flex-direction: column; align-items: stretch; }
+      .modal-card .btn { width: 100%; }
+    }
+
+    /* Bible scenery: a themed landscape behind each round, crossfading as you move on */
+    .scenery { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+    .scene { position: absolute; inset: 0; opacity: 0; transition: opacity .8s ease; background: linear-gradient(180deg, var(--s1) 0%, var(--s2) 58%, var(--s3) 100%); }
+    .scene.on { opacity: 1; }
+    .scene svg { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: clamp(150px, 32vh, 340px); display: block; }
+    .scene[data-scene="hills"]   { --s1: #7fcfff; --s2: #cdeeff; --s3: #fff8e7; }
+    .scene[data-scene="desert"]  { --s1: #ffdca0; --s2: #ffedcc; --s3: #fff6e2; }
+    .scene[data-scene="village"] { --s1: #a9dcff; --s2: #e4f4ff; --s3: #fff4dc; }
+    .scene[data-scene="lake"]    { --s1: #8fd8ff; --s2: #d6f2ff; --s3: #eafaff; }
+    .scene[data-scene="dusk"]    { --s1: #b9c4ff; --s2: #e6d3f4; --s3: #ffe3cf;
+      background-image:
+        radial-gradient(3px 3px at 8% 12%, #fff, transparent), radial-gradient(4px 4px at 21% 28%, #fff, transparent),
+        radial-gradient(3px 3px at 34% 9%, #fff, transparent), radial-gradient(3px 3px at 47% 22%, #fff, transparent),
+        radial-gradient(3px 3px at 58% 11%, #fff, transparent), radial-gradient(3px 3px at 69% 30%, #fff, transparent),
+        radial-gradient(3px 3px at 82% 14%, #fff, transparent), radial-gradient(3px 3px at 93% 26%, #fff, transparent),
+        radial-gradient(3px 3px at 14% 40%, #fff, transparent), radial-gradient(3px 3px at 75% 44%, #fff, transparent),
+        linear-gradient(180deg, var(--s1) 0%, var(--s2) 58%, var(--s3) 100%); }
+    .cloud--c { display: none; }
+    .boat { animation: boatbob 3.4s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 90%; }
+    @keyframes boatbob { 0%, 100% { transform: translate(880px, 252px) rotate(-2deg); } 50% { transform: translate(880px, 256px) rotate(2deg); } }
+    @media (max-width: 599px) { .scene svg { height: clamp(120px, 26vh, 240px); } }
+    @media (prefers-reduced-motion: reduce) { .scene { transition: none; } .boat { animation: none !important; } }
+
+    /* Motion pass. Every animation answers a question: feedback, reward, story, or "where am I". Only transform and opacity move. */
+    /* Feedback: right answers pop, wrong answers shake */
+    .choice.correct { animation: choicepop .5s cubic-bezier(.3,1.6,.5,1); }
+    .choice.wrong { animation: shake .42s ease; }
+    @keyframes choicepop { 0% { transform: scale(1); } 40% { transform: scale(1.06) rotate(-0.8deg); } 100% { transform: scale(1); } }
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-7px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(3px); } }
+    /* Hierarchy: each new question rises into place, and "you are here" pulses on the trail */
+    .question.enter { animation: qrise .42s cubic-bezier(.16,1,.3,1) both; }
+    @keyframes qrise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+    .trail-stop { position: relative; }
+    .trail-stop.current::after { content: ''; position: absolute; inset: -4px; border-radius: 50%; border: 3px solid var(--ink); opacity: 0; animation: ring 1.9s ease-out infinite; pointer-events: none; }
+    @keyframes ring { 0% { transform: scale(.9); opacity: .55; } 100% { transform: scale(1.55); opacity: 0; } }
+    /* Reward: stars pop in one by one, friends pop in on the finish screen */
+    .star { display: inline-block; opacity: .35; transform-origin: 50% 60%; }
+    .star.on { opacity: 1; animation: starpop .55s cubic-bezier(.3,1.8,.5,1) both; animation-delay: calc(var(--i) * .24s + .3s); }
+    @keyframes starpop { 0% { opacity: 0; transform: scale(0) rotate(-40deg); } 70% { opacity: 1; transform: scale(1.35) rotate(8deg); } 100% { opacity: 1; transform: scale(1) rotate(0); } }
+    .friends--end .friend { animation: pop .5s cubic-bezier(.3,1.5,.5,1) both; }
+    .friends--end .friend:nth-child(1) { animation-delay: .35s; } .friends--end .friend:nth-child(2) { animation-delay: .5s; }
+    .friends--end .friend:nth-child(3) { animation-delay: .65s; } .friends--end .friend:nth-child(4) { animation-delay: .8s; } .friends--end .friend:nth-child(5) { animation-delay: .95s; }
+    /* Story: words arrive in reading order */
+    .sw { display: inline-block; opacity: 0; animation: wordin .4s ease-out forwards; animation-delay: calc(var(--i) * 34ms); }
+    @keyframes wordin { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    @media (prefers-reduced-motion: reduce) {
+      .choice.correct, .choice.wrong, .question.enter, .trail-stop.current::after, .star.on, .friends--end .friend, .sw { animation: none !important; }
+      .sw { opacity: 1; } .trail-stop.current::after { display: none; }
+    }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
       .cloud, .confetti { display: none; }
@@ -279,6 +408,49 @@
 </head>
 <body>
   <noscript><div style="max-width:560px;margin:40px auto;padding:20px;background:#fff;border:3px solid #1b2a4a;border-radius:18px;font-family:system-ui,sans-serif;font-weight:700;color:#1b2a4a;text-align:center">This game needs a web browser to run. On an iPhone, tap Share, then Open in Safari. On a computer, double-click the file.</div></noscript>
+  
+  <div class="scenery" aria-hidden="true">
+    <div class="scene on" data-scene="hills"><svg viewBox="0 0 1440 320" preserveAspectRatio="xMidYMax slice" focusable="false">
+      <circle cx="1170" cy="118" r="46" fill="#ffd65e"/><circle cx="1170" cy="118" r="62" fill="#ffd65e" opacity=".25"/>
+      <path d="M0 214 Q200 134 400 196 T780 184 T1110 164 T1440 198 V320 H0 Z" fill="#a8e0b0"/>
+      <path d="M0 262 Q250 188 540 248 T1010 238 T1440 250 V320 H0 Z" fill="#7bcb94"/>
+      <path d="M0 304 Q310 252 650 292 T1440 282 V320 H0 Z" fill="#55b57d"/>
+      <g transform="translate(300 268) scale(1)"><ellipse cx="0" cy="0" rx="24" ry="16" fill="#fff"/><circle cx="-14" cy="-8" r="10" fill="#fff"/><circle cx="12" cy="-10" r="10" fill="#fff"/><circle cx="-26" cy="-2" r="8" fill="#3b3550"/><rect x="-14" y="10" width="5" height="12" rx="2" fill="#3b3550"/><rect x="9" y="10" width="5" height="12" rx="2" fill="#3b3550"/></g><g transform="translate(372 276) scale(0.85)"><ellipse cx="0" cy="0" rx="24" ry="16" fill="#fff"/><circle cx="-14" cy="-8" r="10" fill="#fff"/><circle cx="12" cy="-10" r="10" fill="#fff"/><circle cx="-26" cy="-2" r="8" fill="#3b3550"/><rect x="-14" y="10" width="5" height="12" rx="2" fill="#3b3550"/><rect x="9" y="10" width="5" height="12" rx="2" fill="#3b3550"/></g><g transform="translate(1040 252) scale(0.9)"><ellipse cx="0" cy="0" rx="24" ry="16" fill="#fff"/><circle cx="-14" cy="-8" r="10" fill="#fff"/><circle cx="12" cy="-10" r="10" fill="#fff"/><circle cx="-26" cy="-2" r="8" fill="#3b3550"/><rect x="-14" y="10" width="5" height="12" rx="2" fill="#3b3550"/><rect x="9" y="10" width="5" height="12" rx="2" fill="#3b3550"/></g><g transform="translate(1112 258) scale(0.75)"><ellipse cx="0" cy="0" rx="24" ry="16" fill="#fff"/><circle cx="-14" cy="-8" r="10" fill="#fff"/><circle cx="12" cy="-10" r="10" fill="#fff"/><circle cx="-26" cy="-2" r="8" fill="#3b3550"/><rect x="-14" y="10" width="5" height="12" rx="2" fill="#3b3550"/><rect x="9" y="10" width="5" height="12" rx="2" fill="#3b3550"/></g>
+      <g fill="#ffd65e"><circle cx="560" cy="296" r="4"/><circle cx="598" cy="302" r="4"/><circle cx="820" cy="292" r="4"/><circle cx="1290" cy="296" r="4"/></g>
+    </svg></div>
+    <div class="scene" data-scene="desert"><svg viewBox="0 0 1440 320" preserveAspectRatio="xMidYMax slice" focusable="false">
+      <circle cx="230" cy="108" r="52" fill="#ffcf70"/><circle cx="230" cy="108" r="72" fill="#ffcf70" opacity=".25"/>
+      <path d="M0 232 Q220 168 470 226 T900 216 T1440 194 V320 H0 Z" fill="#f6dba5"/>
+      <path d="M0 272 Q300 222 640 270 T1440 252 V320 H0 Z" fill="#edc67f"/>
+      <path d="M0 306 Q400 272 800 302 T1440 294 V320 H0 Z" fill="#e2b265"/>
+      <g transform="translate(980 268) scale(1)"><path d="M0 0 Q14 -40 4 -86" fill="none" stroke="#8a5a3b" stroke-width="9" stroke-linecap="round"/><g transform="translate(4 -86)" fill="#4aa876"><ellipse cx="-30" cy="4" rx="34" ry="9" transform="rotate(-18 -30 4)"/><ellipse cx="30" cy="4" rx="34" ry="9" transform="rotate(18 30 4)"/><ellipse cx="-22" cy="-14" rx="30" ry="8" transform="rotate(-52 -22 -14)"/><ellipse cx="22" cy="-14" rx="30" ry="8" transform="rotate(52 22 -14)"/><ellipse cx="0" cy="-22" rx="26" ry="8" transform="rotate(90 0 -22)"/></g></g><g transform="translate(1090 276) scale(0.8)"><path d="M0 0 Q14 -40 4 -86" fill="none" stroke="#8a5a3b" stroke-width="9" stroke-linecap="round"/><g transform="translate(4 -86)" fill="#4aa876"><ellipse cx="-30" cy="4" rx="34" ry="9" transform="rotate(-18 -30 4)"/><ellipse cx="30" cy="4" rx="34" ry="9" transform="rotate(18 30 4)"/><ellipse cx="-22" cy="-14" rx="30" ry="8" transform="rotate(-52 -22 -14)"/><ellipse cx="22" cy="-14" rx="30" ry="8" transform="rotate(52 22 -14)"/><ellipse cx="0" cy="-22" rx="26" ry="8" transform="rotate(90 0 -22)"/></g></g><g transform="translate(360 282) scale(0.7)"><path d="M0 0 Q14 -40 4 -86" fill="none" stroke="#8a5a3b" stroke-width="9" stroke-linecap="round"/><g transform="translate(4 -86)" fill="#4aa876"><ellipse cx="-30" cy="4" rx="34" ry="9" transform="rotate(-18 -30 4)"/><ellipse cx="30" cy="4" rx="34" ry="9" transform="rotate(18 30 4)"/><ellipse cx="-22" cy="-14" rx="30" ry="8" transform="rotate(-52 -22 -14)"/><ellipse cx="22" cy="-14" rx="30" ry="8" transform="rotate(52 22 -14)"/><ellipse cx="0" cy="-22" rx="26" ry="8" transform="rotate(90 0 -22)"/></g></g>
+    </svg></div>
+    <div class="scene" data-scene="village"><svg viewBox="0 0 1440 320" preserveAspectRatio="xMidYMax slice" focusable="false">
+      <path d="M0 212 Q300 128 600 200 T1100 178 T1440 190 V320 H0 Z" fill="#b9dca8"/>
+      <rect x="580" y="176" width="62" height="40" rx="3" fill="#f6e7c8"/><rect x="605" y="198" width="12" height="18" rx="2" fill="#c79a63"/><rect x="577" y="171" width="68" height="7" rx="2" fill="#e3cfa2"/><rect x="660" y="168" width="70" height="46" rx="3" fill="#f6e7c8"/><rect x="689" y="196" width="12" height="18" rx="2" fill="#c79a63"/><rect x="657" y="163" width="76" height="7" rx="2" fill="#e3cfa2"/><rect x="748" y="176" width="56" height="38" rx="3" fill="#f6e7c8"/><rect x="770" y="196" width="12" height="18" rx="2" fill="#c79a63"/><rect x="745" y="171" width="62" height="7" rx="2" fill="#e3cfa2"/><rect x="612" y="214" width="54" height="34" rx="3" fill="#f6e7c8"/><rect x="633" y="230" width="12" height="18" rx="2" fill="#c79a63"/><rect x="609" y="209" width="60" height="7" rx="2" fill="#e3cfa2"/><rect x="700" y="216" width="62" height="36" rx="3" fill="#f6e7c8"/><rect x="725" y="234" width="12" height="18" rx="2" fill="#c79a63"/><rect x="697" y="211" width="68" height="7" rx="2" fill="#e3cfa2"/>
+      <path d="M0 270 Q400 202 800 260 T1440 240 V320 H0 Z" fill="#86c785"/>
+      <path d="M840 320 Q870 276 900 240" fill="none" stroke="#ecd8a8" stroke-width="22" stroke-linecap="round"/>
+      <g transform="translate(210 262) scale(1)"><path d="M0 0 Q-6 -20 2 -36" fill="none" stroke="#8a5a3b" stroke-width="9" stroke-linecap="round"/><ellipse cx="2" cy="-52" rx="34" ry="24" fill="#8fb184"/><ellipse cx="-14" cy="-44" rx="20" ry="14" fill="#7aa274"/><ellipse cx="20" cy="-58" rx="18" ry="12" fill="#9cbf90"/></g><g transform="translate(1180 250) scale(0.9)"><path d="M0 0 Q-6 -20 2 -36" fill="none" stroke="#8a5a3b" stroke-width="9" stroke-linecap="round"/><ellipse cx="2" cy="-52" rx="34" ry="24" fill="#8fb184"/><ellipse cx="-14" cy="-44" rx="20" ry="14" fill="#7aa274"/><ellipse cx="20" cy="-58" rx="18" ry="12" fill="#9cbf90"/></g><g transform="translate(1290 266) scale(0.75)"><path d="M0 0 Q-6 -20 2 -36" fill="none" stroke="#8a5a3b" stroke-width="9" stroke-linecap="round"/><ellipse cx="2" cy="-52" rx="34" ry="24" fill="#8fb184"/><ellipse cx="-14" cy="-44" rx="20" ry="14" fill="#7aa274"/><ellipse cx="20" cy="-58" rx="18" ry="12" fill="#9cbf90"/></g>
+    </svg></div>
+    <div class="scene" data-scene="lake"><svg viewBox="0 0 1440 320" preserveAspectRatio="xMidYMax slice" focusable="false">
+      <circle cx="250" cy="100" r="46" fill="#fff3b0"/><circle cx="250" cy="100" r="64" fill="#fff3b0" opacity=".3"/>
+      <path d="M0 200 Q260 140 520 190 T1010 170 T1440 196 V240 H0 Z" fill="#8fcf9b"/>
+      <rect y="226" width="1440" height="94" fill="#5fb7e8"/><rect y="262" width="1440" height="58" fill="#7cc7f0"/>
+      <g fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".65"><path d="M120 248 q18 -9 36 0 t36 0"/><path d="M420 282 q18 -9 36 0 t36 0"/><path d="M1180 244 q18 -9 36 0 t36 0"/><path d="M1020 296 q18 -9 36 0 t36 0"/><path d="M640 252 q18 -9 36 0 t36 0"/></g>
+      <g class="boat" transform="translate(880 252)">
+        <path d="M-52 0 H52 L36 22 H-36 Z" fill="#a9703f"/><rect x="-2" y="-72" width="4" height="72" fill="#8a5a3b"/>
+        <path d="M6 -68 L48 -8 H6 Z" fill="#fff"/><path d="M-6 -58 L-34 -8 H-6 Z" fill="#ffe9b3"/>
+      </g>
+    </svg></div>
+    <div class="scene" data-scene="dusk"><svg viewBox="0 0 1440 320" preserveAspectRatio="xMidYMax slice" focusable="false">
+      <circle cx="1230" cy="92" r="34" fill="#fff7d6"/><circle cx="1244" cy="82" r="30" fill="#c9cff7"/>
+      <path d="M720 40 l6 20 20 6 -20 6 -6 20 -6 -20 -20 -6 20 -6 Z" fill="#fff3b0"/><circle cx="720" cy="66" r="30" fill="#fff3b0" opacity=".22"/>
+      <path d="M0 230 Q300 158 640 220 T1440 204 V320 H0 Z" fill="#8fa8e0"/>
+      <path d="M0 270 Q360 206 760 262 T1440 244 V320 H0 Z" fill="#6f8bd0"/>
+      <path d="M0 306 Q420 266 840 300 T1440 290 V320 H0 Z" fill="#566fb5"/>
+      <g transform="translate(240 268) scale(0.9)"><path d="M0 0 Q-6 -20 2 -36" fill="none" stroke="#8a5a3b" stroke-width="9" stroke-linecap="round"/><ellipse cx="2" cy="-52" rx="34" ry="24" fill="#8fb184"/><ellipse cx="-14" cy="-44" rx="20" ry="14" fill="#7aa274"/><ellipse cx="20" cy="-58" rx="18" ry="12" fill="#9cbf90"/></g><g transform="translate(1150 254) scale(0.8)"><path d="M0 0 Q-6 -20 2 -36" fill="none" stroke="#8a5a3b" stroke-width="9" stroke-linecap="round"/><ellipse cx="2" cy="-52" rx="34" ry="24" fill="#8fb184"/><ellipse cx="-14" cy="-44" rx="20" ry="14" fill="#7aa274"/><ellipse cx="20" cy="-58" rx="18" ry="12" fill="#9cbf90"/></g>
+    </svg></div>
+  </div>
   <div class="rays" aria-hidden="true"></div>
   <div class="cloud cloud--a" aria-hidden="true"><svg viewBox="0 0 300 120"><path fill="#fff" d="M40 110c-22 0-34-16-30-32 3-14 18-22 30-18 4-22 24-38 48-34 10-16 30-22 48-14 14-10 36-6 46 10 24-6 46 6 50 28 22 0 34 16 28 34-4 12-16 16-26 16z"/></svg></div>
   <div class="cloud cloud--b" aria-hidden="true"><svg viewBox="0 0 300 120"><path fill="#fff" d="M40 110c-22 0-34-16-30-32 3-14 18-22 30-18 4-22 24-38 48-34 10-16 30-22 48-14 14-10 36-6 46 10 24-6 46 6 50 28 22 0 34 16 28 34-4 12-16 16-26 16z"/></svg></div>
@@ -286,9 +458,24 @@
 
   <div class="site">
     <header class="top">
-      <a class="logo" href="#start">
+      <a class="logo" href="#start" id="logo-home" title="Back to the main menu" aria-label="Open the Book, back to the main menu">
         <span class="logo-badge" aria-hidden="true">
-          <svg width="30" height="30" viewBox="0 0 64 64"><path fill="#1b2a4a" d="M29 6h6v52h-6zM8 22h48v6H8zM4 14h6v22H4zM54 14h6v22h-6z"/></svg>
+          <svg width="44" height="44" viewBox="0 0 100 100" aria-hidden="true">
+            <g stroke="#1b2a4a" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round">
+              <path d="M10 100 Q12 72 50 68 Q88 72 90 100 Z" fill="#ffffff"/>
+              <path d="M40 70 L50 84 L60 70" fill="#cfe9ff"/>
+              <path d="M25 52 Q20 24 50 19 Q80 24 75 52 Q78 72 70 78 L30 78 Q22 72 25 52 Z" fill="#8a5a3b"/>
+              <ellipse cx="50" cy="48" rx="21" ry="24" fill="#ffe2c2"/>
+              <path d="M30 52 Q31 78 50 81 Q69 78 70 52 Q62 66 50 66 Q38 66 30 52 Z" fill="#8a5a3b"/>
+              <path d="M30 40 Q50 20 70 40 Q60 31 50 31 Q40 31 30 40 Z" fill="#8a5a3b" stroke="none"/>
+            </g>
+            <circle cx="42" cy="48" r="3" fill="#1b2a4a"/><circle cx="58" cy="48" r="3" fill="#1b2a4a"/>
+            <circle cx="43" cy="47" r="1" fill="#fff"/><circle cx="59" cy="47" r="1" fill="#fff"/>
+            <circle cx="36" cy="57" r="3.6" fill="#ff8fa3" opacity=".75"/><circle cx="64" cy="57" r="3.6" fill="#ff8fa3" opacity=".75"/>
+            <path d="M44 59 Q50 64 56 59" fill="none" stroke="#1b2a4a" stroke-width="3" stroke-linecap="round"/>
+            <ellipse cx="50" cy="11" rx="17" ry="4.6" fill="none" stroke="#ffc83d" stroke-width="4.2"/>
+            <ellipse cx="50" cy="11" rx="17" ry="4.6" fill="none" stroke="#1b2a4a" stroke-width="1" opacity=".35"/>
+          </svg>
         </span>
         Open the Book
       </a>
@@ -365,6 +552,7 @@
 
       <!-- GAME -->
       <section id="game" class="panel hidden" aria-live="off">
+        <button class="back-btn" type="button" data-back>‹ Back</button>
         <div class="talk">
           <div class="john bob" id="john-game" data-john>
             <svg id="game-svg" viewBox="0 0 200 200" role="img" aria-label="John the lamb"><use id="game-use" href="#john-art"/></svg>
@@ -375,8 +563,8 @@
         <ol class="trail" id="trail" aria-label="Your trail"></ol>
 
         <div class="game-head">
-          <span class="round-pill"><span class="round-num" id="round-num">1</span><span id="round-label">Round 1 of 4</span></span>
-          <span class="count-pill" id="count-label">Question 1 of 21</span>
+          <span class="round-pill"><span class="round-num" id="round-num">1</span><span id="round-label">Round 1 of 5</span></span>
+          <span class="count-pill" id="count-label">Question 1 of 26</span>
         </div>
         <div class="progress" aria-hidden="true"><span id="bar"></span></div>
 
@@ -389,8 +577,22 @@
         </div>
       </section>
 
+      <!-- LOADING -->
+      <section id="loading" class="panel hidden" aria-labelledby="load-title">
+        <button class="back-btn" type="button" data-back>‹ Back</button>
+        <div class="loader" role="status">
+          <div class="john bob" aria-hidden="true">
+            <svg viewBox="0 0 200 200"><use href="#john-art"/></svg>
+          </div>
+          <div class="book" aria-hidden="true"><span class="page p1"></span><span class="page p2"></span><span class="page p3"></span></div>
+          <h2 id="load-title">Opening the book<span class="dots" aria-hidden="true"><i></i><i></i><i></i></span></h2>
+          <p class="hint">Tap anywhere to skip</p>
+        </div>
+      </section>
+
       <!-- STORY -->
       <section id="story" class="panel hidden" aria-labelledby="story-title">
+        <button class="back-btn" type="button" data-back>‹ Back</button>
         <div class="story-card">
           <div class="john bob" id="story-char">
             <svg id="story-svg" viewBox="0 0 200 200" role="img" aria-label="John the lamb"><use id="story-use" href="#john-art"/></svg>
@@ -448,6 +650,18 @@
     </main>
 
     <footer class="foot"><span>Bible study group · every Monday at 7 p.m. · Questions for beginners, from beginners</span></footer>
+  </div>
+
+
+  <div id="confirm" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+    <div class="modal-card">
+      <h2 id="confirm-title">Leave the game?</h2>
+      <p id="confirm-text">Your progress will be lost.</p>
+      <div class="row">
+        <button class="btn" id="confirm-stay" type="button">Keep playing</button>
+        <button class="btn btn--light" id="confirm-leave" type="button">Leave</button>
+      </div>
+    </div>
   </div>
 
   <!-- Shared John artwork, reused by the game and finish screens -->
@@ -564,7 +778,7 @@
       // Content is the same questions as before, plus a short story for each round and a new quick-fire round.
       var ROUNDS = [
         {
-          name: 'Two parts', color: '#ffd65e', host: 'pip', badge: 'Two Parts Pin',
+          name: 'Two parts', color: '#ffd65e', scene: 'hills', host: 'pip', badge: 'Two Parts Pin',
           storyTitle: 'Pip finds a very big book',
           story: "Pip the dove found a huge old book in the library. \"It has two halves!\" Pip chirped. The first half is called the Old Testament, and the second half is called the New Testament. Can you help Pip tell which books belong where?",
           intro: 'Choose which part of the Bible each book belongs to.',
@@ -584,7 +798,7 @@
           ]
         },
         {
-          name: 'Find the address', color: '#9be3c2', host: 'hazel', badge: 'Address Finder',
+          name: 'Find the address', color: '#9be3c2', scene: 'desert', host: 'hazel', badge: 'Address Finder',
           storyTitle: 'Hazel and the map of verses',
           story: "Hazel the owl loves maps and addresses. \"Every verse has an address,\" she hooted. \"First the book, then the chapter, then the verse.\" Come and practice finding the right spot with Hazel.",
           intro: 'A Bible reference works like an address: book, then chapter, then verse.',
@@ -604,7 +818,7 @@
           ]
         },
         {
-          name: 'Words you will hear', color: '#b8e4ff', host: 'leo', badge: 'Word Explorer',
+          name: 'Words you will hear', color: '#b8e4ff', scene: 'village', host: 'leo', badge: 'Word Explorer',
           storyTitle: 'Leo and the big words',
           story: "Leo the lion cub keeps hearing big words at Bible study, like gospel and psalm. \"What do they mean?\" he roared, very softly. Let's help Leo learn the plain meanings.",
           intro: 'Match each word to its plain meaning. These words appear often in Bible study.',
@@ -622,7 +836,7 @@
           ]
         },
         {
-          name: 'The four Gospels', color: '#ffb8ad', host: 'john', badge: 'Gospel Guide',
+          name: 'The four Gospels', color: '#ffb8ad', scene: 'lake', host: 'john', badge: 'Gospel Guide',
           storyTitle: 'John\'s favorite shelf',
           story: "John the lamb has a favorite shelf in the library: the four Gospels. They are the first four books of the New Testament, and they tell about the life and teaching of Jesus. Let's go meet them together.",
           intro: 'The first four books of the New Testament are called the Gospels.',
@@ -638,7 +852,7 @@
           ]
         },
         {
-          name: 'Quick fire', color: '#d9c9ff', host: 'john', badge: 'Quick Fire Star',
+          name: 'Quick fire', color: '#d9c9ff', scene: 'dusk', host: 'john', badge: 'Quick Fire Star',
           storyTitle: 'Quick fire with all the friends',
           story: "All the friends are cheering you on! This last round is quick: just say true or false. Everything here is something you already met on the way.",
           intro: 'Is each sentence true or false?',
@@ -659,9 +873,10 @@
 
       var TOTAL = ROUNDS.reduce(function (n, r) { return n + r.questions.length; }, 0);
       var state = { round: 0, q: 0, score: 0, roundScore: [], answered: false, log: [] };
+      var roundLogStart = [];
 
       var $ = function (id) { return document.getElementById(id); };
-      var panels = { start: $('start'), story: $('story'), game: $('game'), roundend: $('roundend'), end: $('end') };
+      var panels = { start: $('start'), loading: $('loading'), story: $('story'), game: $('game'), roundend: $('roundend'), end: $('end') };
       var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       function pick(list) { return list[Math.floor(Math.random() * list.length)]; }
@@ -669,14 +884,36 @@
       function setArt(useEl, id) { useEl.setAttribute('href', '#' + id); }
 
       function mood(el, m) {
-        el.classList.remove('bob', 'jump', 'wobble');
+        el.classList.remove('bob', 'jump', 'wobble', 'dance');
+        el.querySelectorAll('.note').forEach(function (n) { n.remove(); });
         void el.offsetWidth;
         el.classList.add(m === 'idle' ? 'bob' : m);
+        if (m === 'dance' && !reduce) {
+          ['\u266A', '\u266B', '\u266A'].forEach(function (g) {
+            var s = document.createElement('span');
+            s.className = 'note';
+            s.setAttribute('aria-hidden', 'true');
+            s.textContent = g;
+            el.appendChild(s);
+          });
+          setTimeout(function () { el.querySelectorAll('.note').forEach(function (n) { n.remove(); }); }, 1700);
+        }
       }
       function say(text) { $('john-game-bubble').textContent = text; }
 
+      var sceneEls = document.querySelectorAll('.scene');
+      function sceneFor(name) {
+        if (name === 'story' || name === 'game' || name === 'roundend') return ROUNDS[state.round].scene;
+        if (name === 'end') return 'dusk';
+        return 'hills';
+      }
+      function setScene(key) {
+        sceneEls.forEach(function (el) { el.classList.toggle('on', el.getAttribute('data-scene') === key); });
+      }
       function show(name) {
         Object.keys(panels).forEach(function (k) { panels[k].classList.toggle('hidden', k !== name); });
+        setScene(sceneFor(name));
+        if (name !== 'start' && !show.fromHistory) { try { history.pushState({ p: name }, ''); } catch (e) {} }
         panels[name].setAttribute('tabindex', '-1');
         panels[name].focus({ preventScroll: false });
         window.scrollTo({ top: 0, behavior: 'auto' });
@@ -693,6 +930,45 @@
         return p >= 0.9 ? 3 : p >= 0.6 ? 2 : 1;   // everyone earns at least one star
       }
       function starText(n) { return '★'.repeat(n) + '☆'.repeat(3 - n); }
+
+      // Motion helpers. All of them fall back to the plain, finished state under reduced motion.
+      function revealWords(el, text) {
+        el.textContent = '';
+        if (reduce) { el.textContent = text; return; }
+        text.split(' ').forEach(function (word, i, all) {
+          var s = document.createElement('span');
+          s.className = 'sw';
+          s.style.setProperty('--i', Math.min(i, 60));
+          s.textContent = word;
+          el.appendChild(s);
+          if (i < all.length - 1) el.appendChild(document.createTextNode(' '));
+        });
+      }
+      function renderStars(el, n) {
+        el.innerHTML = '';
+        for (var i = 0; i < 3; i++) {
+          var s = document.createElement('span');
+          s.className = 'star' + (i < n ? ' on' : '');
+          s.style.setProperty('--i', i);
+          s.textContent = i < n ? '\u2605' : '\u2606';
+          s.setAttribute('aria-hidden', 'true');
+          el.appendChild(s);
+        }
+        el.setAttribute('aria-label', n + ' out of 3 stars');
+      }
+      var countTimer = null;
+      function countUp(el, to) {
+        if (countTimer) cancelAnimationFrame(countTimer);
+        if (reduce || to === 0) { el.textContent = to; return; }
+        var t0 = null, dur = 650;
+        el.textContent = 0;
+        (function tick(ts) {
+          if (t0 === null) t0 = ts;
+          var p = Math.min(1, (ts - t0) / dur);
+          el.textContent = Math.round(to * (1 - Math.pow(1 - p, 3)));
+          if (p < 1) countTimer = requestAnimationFrame(tick); else el.textContent = to;
+        })(performance.now());
+      }
 
       function buildTrail() {
         var t = $('trail');
@@ -715,12 +991,19 @@
         $('story-svg').setAttribute('aria-label', h.name);
         $('story-eyebrow').textContent = 'Story ' + (state.round + 1) + ' of ' + ROUNDS.length;
         $('story-title').textContent = round.storyTitle;
-        $('story-text').textContent = round.story;
+        revealWords($('story-text'), round.story);
         mood($('story-char'), 'bob');
         show('story');
       }
 
       function startRound() {
+        var r = state.round;
+        if (roundLogStart[r] !== undefined) {           // replaying this round: undo its earlier answers first
+          state.log.length = roundLogStart[r];
+          state.score -= (state.roundScore[r] || 0);
+          state.roundScore[r] = 0;
+        }
+        roundLogStart[r] = state.log.length;
         state.q = 0;
         show('game');
         render();
@@ -740,6 +1023,7 @@
         $('count-label').textContent = 'Question ' + (allIndex() + 1) + ' of ' + TOTAL;
         $('bar').style.width = (allIndex() / TOTAL * 100) + '%';
         $('question').textContent = item.prompt;
+        var qEl = $('question'); qEl.classList.remove('enter'); void qEl.offsetWidth; qEl.classList.add('enter');
         $('hint').textContent = first ? round.intro + ' ' + item.hint : item.hint;
         say(first ? pick(h.start) : item.hint);
         var box = $('choices');
@@ -786,7 +1070,7 @@
         fb.appendChild(s);
         fb.appendChild(document.createTextNode((correct ? '' : 'The answer is "' + item.options[item.answer] + '". ') + item.why));
         say(correct ? pick(h.cheer) : pick(h.oops));
-        mood($('john-game'), correct ? 'jump' : 'wobble');
+        mood($('john-game'), correct ? 'dance' : 'wobble');
         if (correct && !reduce) burst(14);
         $('btn-next').disabled = false;
         $('btn-next').focus();
@@ -822,14 +1106,13 @@
         setArt($('re-use'), h.art);
         $('re-svg').setAttribute('aria-label', h.name);
         $('re-title').textContent = round.name + ' done!';
-        $('re-stars').textContent = starText(stars);
-        $('re-stars').setAttribute('aria-label', stars + ' out of 3 stars');
+        renderStars($('re-stars'), stars);
         $('re-score').textContent = 'You got ' + got + ' of ' + total + '.';
         $('re-badge').textContent = round.badge + ' collected';
         $('re-msg').textContent = stars === 3 ? h.name.split(' ')[0] + ' is cheering for you!' : stars === 2 ? 'Nice work! Almost all of them.' : 'Good effort! Every round makes it easier.';
         var last = state.round + 1 === ROUNDS.length;
         $('btn-roundnext').textContent = last ? 'See my score' : 'Next story';
-        mood($('re-char'), 'jump');
+        mood($('re-char'), stars >= 2 ? 'dance' : 'jump');
         show('roundend');
         if (stars >= 2 && !reduce) burst(24);
       }
@@ -840,7 +1123,7 @@
       }
 
       function finish() {
-        $('final-score').textContent = state.score;
+        countUp($('final-score'), state.score);
         $('final-total').textContent = TOTAL;
         var pct = state.score / TOTAL;
         $('end-message').textContent = pct === 1 ? 'Every answer right! You are ready for Monday!' : pct >= 0.6 ? 'You know the basics. Nice work!' : "Everyone starts here. Let's read the answers together!";
@@ -868,7 +1151,7 @@
         });
         $('review').classList.add('hidden');
         show('end');
-        mood($('john-end'), 'jump');
+        mood($('john-end'), pct >= 0.6 ? 'dance' : 'jump');
         if (pct >= 0.6 && !reduce) burst(40);
       }
 
@@ -889,12 +1172,87 @@
         box.focus();
       }
 
-      function begin() {
-        state.round = 0; state.q = 0; state.score = 0; state.roundScore = []; state.log = [];
+      var loadTimer = null;
+      function leaveLoading() {
+        clearTimeout(loadTimer);
+        if (panels.loading.classList.contains('hidden')) return;
         showStory();
       }
+      function begin() {
+        state.round = 0; state.q = 0; state.score = 0; state.roundScore = []; state.log = []; roundLogStart = [];
+        clearTimeout(loadTimer);
+        show('loading');
+        loadTimer = setTimeout(leaveLoading, reduce ? 500 : 1700);
+      }
+
+      // ---- Going back ----
+      function current() { return ['start', 'loading', 'story', 'game', 'roundend', 'end'].filter(function (k) { return !panels[k].classList.contains('hidden'); })[0]; }
+      function inProgress() {
+        var c = current();
+        return c === 'game' || c === 'roundend' || (c === 'story' && state.round > 0);
+      }
+      function resetToStart() {
+        clearTimeout(loadTimer);
+        state.round = 0; state.q = 0; state.score = 0; state.roundScore = []; state.log = []; roundLogStart = []; state.answered = false;
+        show('start');
+        $('btn-begin').focus();
+      }
+      var confirmReturnFocus = null;
+      function askLeave(title, text, leaveLabel, onLeave) {
+        confirmReturnFocus = document.activeElement;
+        $('confirm-title').textContent = title;
+        $('confirm-text').textContent = text;
+        $('confirm-leave').textContent = leaveLabel;
+        $('confirm').classList.remove('hidden');
+        $('confirm-stay').focus();
+        askLeave.onLeave = onLeave;
+      }
+      function closeConfirm() {
+        $('confirm').classList.add('hidden');
+        if (confirmReturnFocus && confirmReturnFocus.focus) confirmReturnFocus.focus();
+      }
+      $('confirm-stay').addEventListener('click', closeConfirm);
+      $('confirm-leave').addEventListener('click', function () {
+        $('confirm').classList.add('hidden');
+        var f = askLeave.onLeave; askLeave.onLeave = null;
+        if (f) f();
+      });
+      $('confirm').addEventListener('click', function (e) { if (e.target === $('confirm')) closeConfirm(); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && !$('confirm').classList.contains('hidden')) { e.preventDefault(); closeConfirm(); }
+      });
+
+      function goHome() {
+        if (!current() || current() === 'start') return;
+        if (inProgress()) askLeave('Leave the game?', 'Your progress will be lost. You can start again from the main menu.', 'Main menu', resetToStart);
+        else resetToStart();
+      }
+      function goBack() {
+        var c = current();
+        if (c === 'loading') { clearTimeout(loadTimer); resetToStart(); }
+        else if (c === 'story') {
+          if (state.round === 0) resetToStart();
+          else { state.round--; roundEnd(); }
+        }
+        else if (c === 'game') {
+          if (state.q > 0 || state.answered) askLeave('Go back to the story?', 'This round will start again from question 1.', 'Go back', showStory);
+          else showStory();
+        }
+        else if (c === 'roundend') goHome();
+        else if (c === 'end') resetToStart();
+      }
+      document.querySelectorAll('[data-back]').forEach(function (b) { b.addEventListener('click', goBack); });
+      $('logo-home').addEventListener('click', function (e) { e.preventDefault(); goHome(); });
+
+      // The phone's own Back button steps back one screen instead of leaving the game
+      window.addEventListener('popstate', function () {
+        if (current() === 'start') return;
+        show.fromHistory = true;
+        try { goBack(); } finally { show.fromHistory = false; }
+      });
 
       $('btn-begin').addEventListener('click', begin);
+      panels.loading.addEventListener('click', leaveLoading);
       $('btn-story-go').addEventListener('click', startRound);
       $('btn-next').addEventListener('click', next);
       $('btn-roundnext').addEventListener('click', afterRound);
